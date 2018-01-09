@@ -1,0 +1,250 @@
+---
+title: "R Notes"
+params:
+  home.dir: /home/fay/code/r_coursera
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+chooseCRANmirror(graphics=FALSE, ind=1)
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = normalizePath(params$home.dir)) 
+```
+
+# Table of Content
+* [Search for Documentation]
+* [Install/Load Packages]
+* [Plotting]
+* [Reading/Writing R Objects]
+* [Read Webpages]
+* [Handling Missing Values]
+* [For Loop]
+* [Loop Functions]
+* [Factor]
+
+***
+
+## Search for Documentation
+```{r eval=FALSE}
+?read.table
+help.search('data input')
+find('anova')
+
+args('rnorm')
+formals(rnorm)
+str(rnorm)
+```
+
+[Return to [Table of Content]]
+
+***
+
+## Install/Load Packages
+```{r}
+a <- available.packages()
+head(rownames(a), 3)
+```
+
+```{r eval=FALSE}
+install.packages('swirl')
+install.packages('lubridate')
+install.packages('knitr')
+```
+  
+Install packages from [Bioconductor](http:www.bioconductor.org/install):
+```{r eval=FALSE}
+source('http://bioconductor.org/biocLite.R')
+biocLite()
+```
+  
+Install more than one:
+```{r eval=FALSE}
+biocLite(c('GenomicFeatures', 'AnnotationDbi'))
+```
+  
+Load a library:
+```{r eval=FALSE}
+library('swirl')
+```
+
+Render Rmarkdown:
+```{r eval=FALSE}
+library('knitr')
+```
+  
+Run a R script:
+```{r eval=FALSE}
+source('filename.R')
+```
+
+[Return to [Table of Content]]
+
+***
+
+## Plotting
+```{r}
+library('datasets')
+head(cars)
+str(cars)
+plot(cars, main='Speeds of cars by distance')
+boxplot(cars)
+```
+
+#### Create subplots:
+```{r eval=FALSE}
+par(mfcol=c(1,2))
+```
+This is the same as `par(mfrow=c(1,2))`
+  
+#### Use `with` to simplify code:
+```{r echo=-1}
+par(mfcol=c(1,2))
+with(cars, {
+  boxplot(dist, xlab='distance')
+  title('Stopping distance (ft)')
+  boxplot(speed)
+  title('Speed (mph)')
+}
+     )
+```
+
+[Return to [Table of Content]]
+
+***
+
+## Reading/Writing R Objects
+#### `dput` & `dget` --- one R object:
+```{r eval=FALSE}
+y <- data.frame(a = 1, b = 'a')
+dput(y, file = 'y.R')
+new.y <- dget('y.R')
+```
+
+#### `dump` & `source` --- multiple R objects:
+```{r eval=FALSE}
+x <- 'foo'
+y <- data.frame(a = 1, b = 'a')
+dump(c('x', 'y'), file = 'data.R')
+rm(x, y)
+source('data.R')
+```
+
+[Return to [Table of Content]]
+
+***
+
+## Read Webpages
+```{r}
+con <- url('https://nationalzoo.si.edu/news/webcam/archive/2238', 'r')
+x <- readLines(con)
+head(x)
+close(con)
+```
+
+[Return to [Table of Content]]
+
+***
+
+## Handling Missing Values
+```{r}
+x <- c(1, 2, NA, 4, NA, 5)
+bad <- is.na(x)
+x[!bad]
+```
+
+```{r}
+y <- c('a', 'b', 'd', NA, NA, 'f')
+good <- complete.cases(x, y)
+x[good]
+```
+
+`complete.cases` can also be used with dataframes:
+`complete.cases(dataframe_object)`
+
+[Return to [Table of Content]]
+
+***
+
+## For Loop
+Use `seq_along`:
+```{r}
+x <- c('a', 'b', 'c', 'd')
+for(i in seq_along(x)) {
+  print(x[i])
+}
+```
+
+Use `seq_len`
+```{r}
+for(i in seq_len(length(x))) {
+  print(x[i])
+}
+```
+
+[Return to [Table of Content]]
+
+***
+
+## Loop Functions
+* `apply`
+* `lapply`
+* `sapply`
+* `vapply`
+* `mapply`
+* `tapply` (related function: `split`)
+*Note*: `tapply` splits an atomic object, typically a vector; for a dataframe, use `split` combined with `lapply` or `sapply`. 
+e.g.
+```{r}
+library(datasets)
+s <- split(airquality, airquality$Month)
+lapply(s, function(x) {colMeans(x[, c('Ozone', 'Solar.R', 'Wind')])})
+```
+
+Using `tapply` here returns an error:
+```{r error=TRUE}
+tapply(airquality, airquality$Month, function(x) {colMeans(x[, c('Ozone', 'Solar.R', 'Wind')])})
+```
+This is because `length(dataframe)` return the number of columns in the dataframe (not the number of rows).
+
+[Return to [Table of Content]]
+
+***
+
+## Factor
+```{r}
+x <- factor(c("yes", "yes", "no", "yes", "no"), levels = c("yes", "no"))
+x
+```
+
+```{r}
+unclass(x)
+```
+
+#### generate factor levels
+```{r}
+f <- gl(2, 5)
+f
+```
+
+#### compute factor interactions
+```{r}
+x <- rnorm(10)
+f1 <- gl(5, 2)
+f2 <- gl(2, 5)
+interaction(f1, f2)
+```
+
+When more than one factors are put in a list, `split` will call `interaction` automatically:
+```{r}
+split(x, list(f1, f2))
+```
+
+Drop empty levels:
+```{r}
+split(x, list(f1, f2), drop = TRUE)
+```
+[Return to [Table of Content]]
+
+***
