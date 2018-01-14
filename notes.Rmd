@@ -3,26 +3,26 @@ title: "R Notes"
 params:
   home.dir: /home/fay/code/r_coursera
 output:
-  html_document:
-    df_print: paged
+  html_notebook
 ---
 
 ```{r setup, include=FALSE}
 chooseCRANmirror(graphics=FALSE, ind=1)
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = normalizePath(params$home.dir)) 
+knitr::opts_knit$set(root.dir = normalizePath(params$home.dir))
 ```
 
 # Table of Content
 * [Search for Documentation]
 * [Install/Load Packages]
-* [Plotting]
-* [Reading/Writing R Objects]
-* [Read Webpages]
-* [Handling Missing Values]
+* [Handle Missing Values]
 * [For Loop]
 * [Loop Functions]
 * [Factor]
+* [Debugging Tools]
+* [Read/Write]
+* [The `data.table` Package]
+* [Plotting]
 
 ***
 
@@ -52,28 +52,34 @@ install.packages('swirl')
 install.packages('lubridate')
 install.packages('knitr')
 ```
-  
+
 Install packages from [Bioconductor](http:www.bioconductor.org/install):
 ```{r eval=FALSE}
 source('http://bioconductor.org/biocLite.R')
-biocLite()
+biocLite(package.name)
 ```
-  
+
 Install more than one:
 ```{r eval=FALSE}
 biocLite(c('GenomicFeatures', 'AnnotationDbi'))
 ```
-  
+
 Load a library:
 ```{r eval=FALSE}
 library('swirl')
 ```
 
+Check the version of a package:
+```{r}
+packageVersion('swirl')
+```
+
+
 Render Rmarkdown:
 ```{r eval=FALSE}
 library('knitr')
 ```
-  
+
 Run a R script:
 ```{r eval=FALSE}
 source('filename.R')
@@ -83,71 +89,7 @@ source('filename.R')
 
 ***
 
-## Plotting
-```{r}
-library('datasets')
-head(cars)
-str(cars)
-plot(cars, main='Speeds of cars by distance')
-boxplot(cars)
-```
-
-#### Create subplots:
-```{r eval=FALSE}
-par(mfcol=c(1,2))
-```
-This is the same as `par(mfrow=c(1,2))`
-  
-#### Use `with` to simplify code:
-```{r echo=-1}
-par(mfcol=c(1,2))
-with(cars, {
-  boxplot(dist, xlab='distance')
-  title('Stopping distance (ft)')
-  boxplot(speed)
-  title('Speed (mph)')
-}
-     )
-```
-
-[Return to [Table of Content]]
-
-***
-
-## Reading/Writing R Objects
-#### `dput` & `dget` --- one R object:
-```{r eval=FALSE}
-y <- data.frame(a = 1, b = 'a')
-dput(y, file = 'y.R')
-new.y <- dget('y.R')
-```
-
-#### `dump` & `source` --- multiple R objects:
-```{r eval=FALSE}
-x <- 'foo'
-y <- data.frame(a = 1, b = 'a')
-dump(c('x', 'y'), file = 'data.R')
-rm(x, y)
-source('data.R')
-```
-
-[Return to [Table of Content]]
-
-***
-
-## Read Webpages
-```{r}
-con <- url('https://nationalzoo.si.edu/news/webcam/archive/2238', 'r')
-x <- readLines(con)
-head(x)
-close(con)
-```
-
-[Return to [Table of Content]]
-
-***
-
-## Handling Missing Values
+## Handle Missing Values
 ```{r}
 x <- c(1, 2, NA, 4, NA, 5)
 bad <- is.na(x)
@@ -194,7 +136,7 @@ for(i in seq_len(length(x))) {
 * `vapply`
 * `mapply`
 * `tapply` (related function: `split`)
-*Note*: `tapply` splits an atomic object, typically a vector; for a dataframe, use `split` combined with `lapply` or `sapply`. 
+*Note*: `tapply` splits an atomic object, typically a vector; for a dataframe, use `split` combined with `lapply` or `sapply`.
 e.g.
 ```{r}
 library(datasets)
@@ -245,6 +187,498 @@ Drop empty levels:
 ```{r}
 split(x, list(f1, f2), drop = TRUE)
 ```
+[Return to [Table of Content]]
+
+***
+
+## Debugging Tools
+These are interactive tools that are meant to be used in the console:
+* `traceback`
+
+```{r error=TRUE}
+library(datasets)
+tapply(airquality, airquality$Month, function(x) {colMeans(x[, c('Ozone', 'Solar.R', 'Wind')])})
+traceback()
+```
+
+* `debug`
+```{r eval=FALSE}
+debug(tapply)
+tapply(airquality, airquality$Month, function(x) {colMeans(x[, c('Ozone', 'Solar.R', 'Wind')])})
+n  # for the next line
+```
+
+* `browser`
+* `trace`
+* `recover`
+```{r eval=FALSE}
+options(error = recover)
+```
+
+[Return to [Table of Content]]
+
+***
+
+## Read/Write
+* [Read/Write R Objects]
+* [Download Data]
+* [Read/Write Excel Files]
+* [Read XML]
+* [Read HTML (Webpages)]
+* [Read from APIs]
+* [Read/Write JSON]
+* [Read from MySQL]  
+* [Read from HDF5]
+  
+  
+### Further reading:  
+
+- `?connections`
+- [This R Data Import Tutorial Is Everything You Need](https://www.r-bloggers.com/this-r-data-import-tutorial-is-everything-you-need/)
+
+
+### Other database packages:
+
+- `RPostgresql`
+- `RODBC`
+- `RMongo`
+
+### Read images:
+
+- `jpeg`
+- `readbitmap`
+- `png`
+- `EBImage` (Bioconductor)
+
+
+### Read GIS data:
+
+- `rdgal`
+- `rgeos`
+- `raster`
+
+
+### Read music data:
+
+- `tuneR`
+- `seewave`
+
+
+***
+
+### Read/Write R Objects
+#### `dput` & `dget` --- one R object:
+```{r eval=FALSE}
+y <- data.frame(a = 1, b = 'a')
+dput(y, file = 'y.R')
+new.y <- dget('y.R')
+```
+
+#### `dump` & `source` --- multiple R objects:
+```{r eval=FALSE}
+x <- 'foo'
+y <- data.frame(a = 1, b = 'a')
+dump(c('x', 'y'), file = 'data.R')
+rm(x, y)
+source('data.R')
+```
+
+[Return to [Table of Content]]
+
+***
+
+### Download Data
+```{r eval=FALSE}
+download.file('https://ailuropoda1864.github.io/portfolio/resume_Jingfei_Cai.pdf', destfile = 'resume.pdf')
+```
+
+[Return to [Table of Content]]
+
+***
+
+### Read/Write Excel Files
+Read Excel files:
+```{r eval=FALSE}
+library(xlsx)
+data <- read.xlsx('filename.xlsx', sheetIndex=1, header=TRUE)
+```
+
+Write Excel files:
+```{r eval=FALSE}
+write.xlsx()
+```
+
+[Return to [Table of Content]]
+
+***
+
+### Read XML
+```{r}
+library(XML)
+fileUrl <- 'https://www.w3schools.com/xml/simple.xml'
+download.file(fileUrl, destfile = 'example_files/simple.xml')
+doc <- xmlTreeParse('example_files/simple.xml', useInternalNodes=TRUE)
+
+rootNode <- xmlRoot(doc)
+xmlName(rootNode)
+```
+
+#### Directly access parts of the XML document:
+```{r}
+rootNode[[1]]
+rootNode[[1]][[1]]
+```
+
+#### Programatically extract parts of the file:
+```{r}
+xmlSApply(rootNode, xmlValue)
+```
+
+#### Extract elements using xpath:
+```{r xpath}
+xpathSApply(rootNode, '//name', xmlValue)
+xpathSApply(rootNode, '//price', xmlValue)
+```
+
+[Return to [Table of Content]]
+
+***
+
+### Read HTML (Webpages)
+
+```{r read HTML}
+con <- url('https://nationalzoo.si.edu/news/webcam/archive/2238', 'r')
+html <- readLines(con)
+close(con)
+
+head(html)
+```
+
+Parse HTML:
+```{r parse HTML}
+library(XML)
+doc <- htmlTreeParse(html, useInternalNodes = TRUE)
+links <- xpathSApply(doc, 
+                     '//div[@class="views-field views-field-title"]/span[@class="field-content"]/a', 
+                     xmlGetAttr, 
+                     name='href')
+links
+```
+
+Alternatively, use `httr` library:
+```{r}
+library(httr)
+html2 <- GET('https://nationalzoo.si.edu/news/webcam/archive/2238')
+content2 <- content(html2, as='text')
+
+parsedHtml <- htmlParse(content2, asText=TRUE)
+xpathSApply(parsedHtml, 
+            '//div[@class="views-field views-field-title"]/span[@class="field-content"]/a',
+            xmlGetAttr,
+            name='href')
+```
+
+**Note:**  `xmlParse` and `htmlParse` are equivalent to the `xmlTreeParse` and `htmlTreeParse` respectively, except they both use a default value for the `useInternalNodes` parameter of TRUE, i.e. they working with and return internal nodes/C-level nodes. These can then be searched using XPath expressions via `xpathApply` and `getNodeSet`.
+  
+  
+`GET` in `httr` can be used to access website with passwords:
+```{r eval=FALSE}
+pg2 = GET(url.string, authenticate('user', 'passwd'))
+```
+
+Use handles to preserve preserves settings and cookies across multiple requests (e.g. authentication):
+```{r eval=FALSE}
+google <- handle('http://google.com')
+pg1 <- GET(handle = google, path='/')
+pg2 <- GET(handle = google, path='search')
+```
+
+[Return to [Table of Content]]
+
+***
+
+### Read from APIs
+```{r eval=FALSE}
+library(httr)
+myapp <- oauth_app('twitter', key='consumerKey', secret='consumerSecret')
+sig <- sign_oauth1.0(myapp, token='token', token_secret='tokenSecret')
+homeTL <- GET('https://api.twitter.com/1.1/statuses/home_timeline.json', sig)
+json1 <- content(homeTL)
+
+# use the jsonlite library to reformat the json object so that it's easier to read
+json2 <- jsonlite::fromJSON(toJSON(json1))
+```
+
+[Return to [Table of Content]]
+
+***
+
+### Read/Write JSON
+#### Read JSON:
+```{r}
+library(jsonlite)
+jsonData <- fromJSON('https://api.github.com/users/Ailuropoda1864/repos')
+names(jsonData)
+```
+
+#### Write data frames to JSON (result hidden):
+```{r write to JSON, results='hide'}
+library(datasets)
+myjson <- toJSON(iris, pretty=TRUE)  # pretty print
+cat(myjson)
+```
+
+#### Convert back to JSON:
+```{r}
+iris2 <- fromJSON(myjson)
+head(iris2)
+```
+
+[Return to [Table of Content]]
+
+***
+
+### Read from MySQL
+Functions covered:  
+
+* `dbConnect`  
+* `dbDisconnect`  
+* `dbListTables`  
+* `dbReadTable`  
+* `dbListFields`  
+* `dbGetQuery`  
+* `dbSendQuery`  
+* `dbFetch`  
+* `dbClearResult`  
+  
+Further reading:  
+
+- [MySQL and R](https://www.r-bloggers.com/mysql-and-r/)
+  
+Connect to and query a MySQL server:
+```{r}
+library(RMySQL)
+ucscDb <- dbConnect(MySQL(), user='genome', host='genome-mysql.soe.ucsc.edu')
+result <- dbGetQuery(ucscDb, 'show databases;')
+dbDisconnect(ucscDb)
+
+head(result)
+```
+
+Connect to a specific database:
+```{r}
+hg19 <- dbConnect(MySQL(), user='genome', host='genome-mysql.soe.ucsc.edu', 
+                  db='hg19')
+```
+
+List all tables:
+```{r}
+allTables <- dbListTables(hg19)
+length(allTables)
+allTables[1:5]
+```
+
+Get dimensions of a specific table:
+```{r}
+dbListFields(hg19, 'affyU133Plus2')
+```
+
+Make a query:
+```{r}
+dbGetQuery(hg19, 'SELECT count(*) FROM affyU133Plus2;')
+```
+
+Read from a specific table:
+```{r warning=FALSE}
+affyData <- dbReadTable(hg19, 'affyU133Plus2')
+head(affyData)
+```
+
+Select a specific subset:
+```{r warning=FALSE}
+query.string <- 
+'SELECT * from affyU133Plus2 
+WHERE misMatches BETWEEN 1 AND 3'
+
+affyMis <- dbGetQuery(hg19, query.string, n=10)
+dim(affyMis)
+```
+
+**Note:**
+`dbGetQuery()` is equivalent to `dbSendQuery()`, then `dbFetch()`, ensuring that the result is always free-d by `dbClearResult()`.
+```{r eval=FALSE}
+query.string <- 
+'SELECT * from affyU133Plus2 
+WHERE misMatches BETWEEN 1 AND 3'
+
+query <- dbSendQuery(hg19, query.string)
+affyMis <- fetch(query, n=10)
+dbClearResult(query)
+
+dim(affyMis)
+```
+
+Close connection when done:
+```{r}
+dbDisconnect(hg19)
+```
+
+[Return to [Table of Content]]
+
+***
+
+### Read from HDF5
+Install R HDF 5 package:
+```{r eval=FALSE}
+source('http://bioconductor.org/biocLite.R')
+biocLite('rhdf5')
+```
+
+Create a HDF5 file:
+```{r}
+library(rhdf5)
+h5.file <- 'example_files/example.h5'
+created <- h5createFile(h5.file)
+created
+```
+
+Create groups:
+```{r}
+created <- h5createGroup(h5.file, 'foo')
+created <- h5createGroup(h5.file, 'baa')
+created <- h5createGroup(h5.file, 'foo/foobaa')
+h5ls(h5.file)
+```
+
+Write to groups:
+```{r}
+A <- matrix(1:10, nrow = 5)
+h5write(A, h5.file, 'foo/A')
+
+B <- array(seq(0.1, 2.0, by=0.1), dim=c(5,2,2))
+attr(B, 'scale') <- 'liter'
+h5write(B, h5.file, 'foo/foobaa/B')
+
+h5ls(h5.file)
+```
+
+Read from a HDF5 file:
+```{r}
+readA <- h5read(h5.file, 'foo/A')
+readB <- h5read(h5.file, 'foo/foobaa/B')
+
+readA
+```
+
+Read/write in chunks:
+```{r}
+h5write(c(12, 13, 14), h5.file, 'foo/A', 
+        index=list(1:3, 1))  # write to the first 3 rows in the first column
+h5read(h5.file, 'foo/A')
+
+h5read(h5.file, 'foo/A', index=list(1:3, 2))
+```
+
+
+[Return to [Table of Content]]
+
+***
+
+## The `data.table` Package
+```{r}
+library(data.table)
+```
+
+```{r}
+DT <- data.table(x=rnorm(9), y=rep(c('a', 'b', 'c'), each=3), z=rnorm(9))
+head(DT, 3)
+```
+
+See all the data tables in memory:
+```{r}
+tables()
+```
+
+Subset rows:
+```{r}
+DT[2,]
+DT[DT$y=='a',]
+DT[c(2,3)]
+```
+
+Columns expressions:
+```{r}
+DT[, c(2,3)]
+DT[, list(mean(x), sum(z))]
+DT[, table(y)]
+
+# add new columns
+DT[, w:= z^2]
+
+# multiple operations
+DT[, m:= {tmp <- (x+z); log2(tmp+5)}]
+
+# plyr-like operations
+DT[, a:= x>0]
+DT[, b:= mean(x+w), by=a]
+
+# special variables
+# .N is like count
+DT[, .N, by=a]
+```
+
+Keys
+```{r}
+DT <- data.table(x=rep(c('a', 'b', 'c'), each=100), y=rnorm(300))
+setkey(DT, x)
+DT['a']
+```
+
+Use keys to facilitate joins:
+```{r}
+DT1 <- data.table(x=c('a', 'a', 'b', 'dt1'), y=1:4)
+DT2 <- data.table(x=c('a', 'b', 'dt2'), y=5:7)
+setkey(DT1, x)
+setkey(DT2, x)
+merge(DT1, DT2)
+```
+
+Read in file:
+```{r eval=FALSE}
+fread(filename)
+```
+
+[Return to [Table of Content]]
+
+***
+
+## Plotting
+```{r}
+library('datasets')
+head(cars)
+str(cars)
+plot(cars, main='Speeds of cars by distance')
+boxplot(cars)
+```
+
+#### Create subplots:
+```{r eval=FALSE}
+par(mfcol=c(1,2))
+```
+This is the same as `par(mfrow=c(1,2))`
+
+#### Use `with` to simplify code:
+```{r echo=-1}
+par(mfcol=c(1,2))
+with(cars, {
+  boxplot(dist, xlab='distance')
+  title('Stopping distance (ft)')
+  boxplot(speed)
+  title('Speed (mph)')
+}
+     )
+```
+
 [Return to [Table of Content]]
 
 ***

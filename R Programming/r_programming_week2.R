@@ -1,5 +1,3 @@
-setwd('/home/fay/code/r_coursera/specdata')
-
 DIR <- '/home/fay/code/r_coursera/specdata'
 
 
@@ -62,13 +60,13 @@ complete <- function(directory, id = 1:322)  {
 # Part 3
 corr <- function(directory, threshold = 0) {
     result <- vector(mode = 'numeric')  # initiate empty numeric vector
-    files <- dir(directory)
+    files <- file.path(directory, dir(directory))
     for(i in seq_along(files)) {
         df <- read.csv(files[i]) 
         if(sum(complete.cases(df)) > threshold) {
             result <- c(result, cor(x = df$sulfate, 
                                     y = df$nitrate, 
-                                    use = 'pairwise.complete.obs'))
+                                    use = "pairwise.complete.obs"))
         }
     }
     result
