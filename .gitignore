@@ -33,6 +33,7 @@ vignettes/*.pdf
 *.knit.md
 
 # data
+*/data/
 *.csv
 *.xlsx
 

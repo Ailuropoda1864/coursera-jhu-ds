@@ -69,6 +69,11 @@ Load a library:
 library('swirl')
 ```
 
+Unload a library:
+```{r eval=FALS}
+detach("package:RMySQL", unload=TRUE)
+```
+
 Check the version of a package:
 ```{r}
 packageVersion('swirl')
