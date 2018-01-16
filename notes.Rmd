@@ -15,13 +15,12 @@ knitr::opts_knit$set(root.dir = normalizePath(params$home.dir))
 # Table of Content
 * [Search for Documentation]
 * [Install/Load Packages]
-* [Handle Missing Values]
 * [For Loop]
 * [Loop Functions]
-* [Factor]
 * [Debugging Tools]
 * [Read/Write]
-* [The `data.table` Package]
+* [Exploratory Data Analysis]
+* [Data Wrangling]
 * [Plotting]
 
 ***
@@ -70,7 +69,7 @@ library('swirl')
 ```
 
 Unload a library:
-```{r eval=FALS}
+```{r eval=FALSE}
 detach("package:RMySQL", unload=TRUE)
 ```
 
@@ -89,26 +88,6 @@ Run a R script:
 ```{r eval=FALSE}
 source('filename.R')
 ```
-
-[Return to [Table of Content]]
-
-***
-
-## Handle Missing Values
-```{r}
-x <- c(1, 2, NA, 4, NA, 5)
-bad <- is.na(x)
-x[!bad]
-```
-
-```{r}
-y <- c('a', 'b', 'd', NA, NA, 'f')
-good <- complete.cases(x, y)
-x[good]
-```
-
-`complete.cases` can also be used with dataframes:
-`complete.cases(dataframe_object)`
 
 [Return to [Table of Content]]
 
@@ -141,6 +120,7 @@ for(i in seq_len(length(x))) {
 * `vapply`
 * `mapply`
 * `tapply` (related function: `split`)
+
 *Note*: `tapply` splits an atomic object, typically a vector; for a dataframe, use `split` combined with `lapply` or `sapply`.
 e.g.
 ```{r}
@@ -155,43 +135,6 @@ tapply(airquality, airquality$Month, function(x) {colMeans(x[, c('Ozone', 'Solar
 ```
 This is because `length(dataframe)` return the number of columns in the dataframe (not the number of rows).
 
-[Return to [Table of Content]]
-
-***
-
-## Factor
-```{r}
-x <- factor(c("yes", "yes", "no", "yes", "no"), levels = c("yes", "no"))
-x
-```
-
-```{r}
-unclass(x)
-```
-
-#### generate factor levels
-```{r}
-f <- gl(2, 5)
-f
-```
-
-#### compute factor interactions
-```{r}
-x <- rnorm(10)
-f1 <- gl(5, 2)
-f2 <- gl(2, 5)
-interaction(f1, f2)
-```
-
-When more than one factors are put in a list, `split` will call `interaction` automatically:
-```{r}
-split(x, list(f1, f2))
-```
-
-Drop empty levels:
-```{r}
-split(x, list(f1, f2), drop = TRUE)
-```
 [Return to [Table of Content]]
 
 ***
@@ -232,11 +175,11 @@ options(error = recover)
 * [Read HTML (Webpages)]
 * [Read from APIs]
 * [Read/Write JSON]
-* [Read from MySQL]  
+* [Read from MySQL]
 * [Read from HDF5]
-  
-  
-### Further reading:  
+
+
+### Further reading:
 
 - `?connections`
 - [This R Data Import Tutorial Is Everything You Need](https://www.r-bloggers.com/this-r-data-import-tutorial-is-everything-you-need/)
@@ -363,9 +306,9 @@ Parse HTML:
 ```{r parse HTML}
 library(XML)
 doc <- htmlTreeParse(html, useInternalNodes = TRUE)
-links <- xpathSApply(doc, 
-                     '//div[@class="views-field views-field-title"]/span[@class="field-content"]/a', 
-                     xmlGetAttr, 
+links <- xpathSApply(doc,
+                     '//div[@class="views-field views-field-title"]/span[@class="field-content"]/a',
+                     xmlGetAttr,
                      name='href')
 links
 ```
@@ -377,15 +320,15 @@ html2 <- GET('https://nationalzoo.si.edu/news/webcam/archive/2238')
 content2 <- content(html2, as='text')
 
 parsedHtml <- htmlParse(content2, asText=TRUE)
-xpathSApply(parsedHtml, 
+xpathSApply(parsedHtml,
             '//div[@class="views-field views-field-title"]/span[@class="field-content"]/a',
             xmlGetAttr,
             name='href')
 ```
 
 **Note:**  `xmlParse` and `htmlParse` are equivalent to the `xmlTreeParse` and `htmlTreeParse` respectively, except they both use a default value for the `useInternalNodes` parameter of TRUE, i.e. they working with and return internal nodes/C-level nodes. These can then be searched using XPath expressions via `xpathApply` and `getNodeSet`.
-  
-  
+
+
 `GET` in `httr` can be used to access website with passwords:
 ```{r eval=FALSE}
 pg2 = GET(url.string, authenticate('user', 'passwd'))
@@ -444,22 +387,22 @@ head(iris2)
 ***
 
 ### Read from MySQL
-Functions covered:  
+Functions covered:
 
-* `dbConnect`  
-* `dbDisconnect`  
-* `dbListTables`  
-* `dbReadTable`  
-* `dbListFields`  
-* `dbGetQuery`  
-* `dbSendQuery`  
-* `dbFetch`  
-* `dbClearResult`  
-  
-Further reading:  
+* `dbConnect`
+* `dbDisconnect`
+* `dbListTables`
+* `dbReadTable`
+* `dbListFields`
+* `dbGetQuery`
+* `dbSendQuery`
+* `dbFetch`
+* `dbClearResult`
+
+Further reading:
 
 - [MySQL and R](https://www.r-bloggers.com/mysql-and-r/)
-  
+
 Connect to and query a MySQL server:
 ```{r}
 library(RMySQL)
@@ -472,7 +415,7 @@ head(result)
 
 Connect to a specific database:
 ```{r}
-hg19 <- dbConnect(MySQL(), user='genome', host='genome-mysql.soe.ucsc.edu', 
+hg19 <- dbConnect(MySQL(), user='genome', host='genome-mysql.soe.ucsc.edu',
                   db='hg19')
 ```
 
@@ -501,8 +444,8 @@ head(affyData)
 
 Select a specific subset:
 ```{r warning=FALSE}
-query.string <- 
-'SELECT * from affyU133Plus2 
+query.string <-
+'SELECT * from affyU133Plus2
 WHERE misMatches BETWEEN 1 AND 3'
 
 affyMis <- dbGetQuery(hg19, query.string, n=10)
@@ -512,8 +455,8 @@ dim(affyMis)
 **Note:**
 `dbGetQuery()` is equivalent to `dbSendQuery()`, then `dbFetch()`, ensuring that the result is always free-d by `dbClearResult()`.
 ```{r eval=FALSE}
-query.string <- 
-'SELECT * from affyU133Plus2 
+query.string <-
+'SELECT * from affyU133Plus2
 WHERE misMatches BETWEEN 1 AND 3'
 
 query <- dbSendQuery(hg19, query.string)
@@ -577,7 +520,7 @@ readA
 
 Read/write in chunks:
 ```{r}
-h5write(c(12, 13, 14), h5.file, 'foo/A', 
+h5write(c(12, 13, 14), h5.file, 'foo/A',
         index=list(1:3, 1))  # write to the first 3 rows in the first column
 h5read(h5.file, 'foo/A')
 
@@ -589,8 +532,144 @@ h5read(h5.file, 'foo/A', index=list(1:3, 2))
 
 ***
 
-## The `data.table` Package
+## Exploratory Data Analysis
+
+#### What the actual data looks like
 ```{r}
+data("UCBAdmissions")
+df <- as.data.frame(UCBAdmissions)
+
+head(df)
+tail(df, 3)
+```
+
+#### Numbers of rows/columns, names of rows/columns, the class of each column, any missing values, any duplicates
+```{r}
+str(df)  # info() in Python
+rownames(df)  # df.index in Python
+names(df)  # df.columns in Python
+
+# missing values
+sum(is.na(df$Admit))
+colSums(is.na(df))
+```
+
+#### Distributions
+- Quantitative variables: quantiles
+- Qualatative variables: number of levels; count for each level
+```{r}
+summary(df)  # describe() in Python
+
+quantile(df$Freq, na.rm=TRUE, probs=c(0, 0.25, 0.5, 0.75, 1))
+
+table(df$Admit, useNA='ifany')  # value_counts in Python
+table(df$Gender, df$Dept)
+```
+
+#### Crosstab
+```{r}
+xtabs(Freq ~ Gender + Admit, data=df)
+```
+
+[Return to [Table of Content]]
+
+***
+
+## Data Wrangling
+* [Handle Missing Values]
+* [Factor]
+* [`data.table`]
+* [`plyr`]
+* [`dplyr`]
+* [Reshape Data]
+* [Merge Data]
+
+### Handle Missing Values
+```{r}
+x <- c(1, 2, NA, 4, NA, 5)
+bad <- is.na(x)
+x[!bad]
+```
+
+```{r}
+y <- c('a', 'b', 'd', NA, NA, 'f')
+good <- complete.cases(x, y)
+x[good]
+```
+
+`complete.cases` can also be used with dataframes:
+`complete.cases(dataframe_object)`
+
+When subsetting a vector/data frame containing `NA` using conditional, use `which`:
+```{r}
+x[which(x>2)]
+# compare with
+x[x>2]
+```
+
+[Return to [Table of Content]]
+
+***
+
+### Factor
+```{r}
+x <- factor(c("yes", "yes", "no", "yes", "no"), levels = c("yes", "no"))
+x
+```
+
+```{r}
+unclass(x)
+```
+
+```{r}
+relevel(x, ref='no')
+```
+
+#### Generate factor levels
+```{r}
+f <- gl(2, 5)
+f
+```
+
+#### Compute factor interactions
+```{r}
+x <- rnorm(10)
+f1 <- gl(5, 2)
+f2 <- gl(2, 5)
+interaction(f1, f2)
+```
+
+#### Split
+When more than one factors are put in a list, `split` will call `interaction` automatically:
+```{r}
+split(x, list(f1, f2))
+```
+
+Drop empty levels:
+```{r}
+split(x, list(f1, f2), drop = TRUE)
+```
+
+#### Create binary variables:
+```{r eval=FALSE}
+ifelse(test, yes, no)
+```
+
+#### Create categorical variables
+```{r eval=FALSE}
+cut(x, breaks)
+
+# Alternatively
+library(Hmisc)
+cut2(x, g=4)
+```
+
+[Return to [Table of Content]]
+
+***
+
+### `data.table`
+```{r load data.table}
 library(data.table)
 ```
 
@@ -652,6 +731,103 @@ Read in file:
 ```{r eval=FALSE}
 fread(filename)
 ```
+
+[Return to [Table of Content]]
+
+***
+
+### `plyr`
+```{r load plyr}
+library(plyr)
+```
+
+#### Order a dataframe by certain variables
+```{r eval=FALSE}
+arrange(dataframe, var1)
+# use base R:
+dataframe[order(dataframe$var1), ]
+
+# in descending order:
+arrange(dataframe, desc(var1))
+```
+
+#### Copy a data frame and add new variables
+```{r eval=FALSE}
+df2 <- mutate(df1, newCol=cut2(oldCol, g=4))
+```
+
+#### Split-apply-combine
+```{r}
+str(InsectSprays, 3)
+ddply(InsectSprays, .(spray), summarize, sum=sum(count))
+```
+
+Or, maintain the dimension so that a new variable can be created:
+```{r}
+spraySums <- ddply(InsectSprays, .(spray), summarize, sum=ave(count, FUN=sum))
+dim(spraySums)
+head(spraySums)
+```
+
+#### Merge data
+Compared with `merge` in base R, it is faster, but less full featured (defaults to left join)
+```{r eval=FALSE}
+join(x, y, by = NULL, type = "left", match = "all")
+```
+
+Merge multiple data frames (which is more difficult with `merge`)
+```{r}
+df1 <- data.frame(id=sample(1:10), x=rnorm(10))
+df2 <- data.frame(id=sample(1:10), y=rnorm(10))
+df3 <- data.frame(id=sample(1:10), z=rnorm(10))
+dfList = list(df1, df2, df3)
+join_all(dfList)
+```
+
+[Return to [Table of Content]]
+
+***
+
+### `dplyr`
+
+- `select`
+- `filter`
+- `arrange`
+- `rename`  
+`rename(df, newName = oldName)`
+- `mutate`
+- `group_by`
+- `summarize`
+- `%>%`
+
+[Return to [Table of Content]]
+
+***
+
+### Reshape Data
+```{r load reshape2, eval=FALSE}
+library(reshape2)
+```
+
+#### Melt data frames
+```{r eval=FALSE}
+melt(df, id, measure.vars)
+```
+
+#### Cast data frames
+```{r eval=FALSE}
+dcast(data, formula, fun.aggregate)
+```
+See also: `acast`
+
+[Return to [Table of Content]]
+
+***
+
+### Merge Data
+`merge`  
+`intersect`
+
 
 [Return to [Table of Content]]
 

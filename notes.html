@@ -129,13 +129,12 @@ $(document).ready(function () {
 <ul>
 <li><a href="#search-for-documentation">Search for Documentation</a></li>
 <li><a href="#installload-packages">Install/Load Packages</a></li>
-<li><a href="#handle-missing-values">Handle Missing Values</a></li>
 <li><a href="#for-loop">For Loop</a></li>
 <li><a href="#loop-functions">Loop Functions</a></li>
-<li><a href="#factor">Factor</a></li>
 <li><a href="#debugging-tools">Debugging Tools</a></li>
 <li><a href="#readwrite">Read/Write</a></li>
-<li><a href="#the-data.table-package">The <code>data.table</code> Package</a></li>
+<li><a href="#exploratory-data-analysis">Exploratory Data Analysis</a></li>
+<li><a href="#data-wrangling">Data Wrangling</a></li>
 <li><a href="#plotting">Plotting</a></li>
 </ul>
 <hr />
@@ -166,6 +165,8 @@ biocLite(package.name)</code></pre>
 <pre class="r"><code>biocLite(c('GenomicFeatures', 'AnnotationDbi'))</code></pre>
 <p>Load a library:</p>
 <pre class="r"><code>library('swirl')</code></pre>
+<p>Unload a library:</p>
+<pre class="r"><code>detach(&quot;package:RMySQL&quot;, unload=TRUE)</code></pre>
 <p>Check the version of a package:</p>
 <pre class="r"><code>packageVersion('swirl')</code></pre>
 <pre><code>## [1] '2.4.3'</code></pre>
@@ -173,20 +174,6 @@ biocLite(package.name)</code></pre>
 <pre class="r"><code>library('knitr')</code></pre>
 <p>Run a R script:</p>
 <pre class="r"><code>source('filename.R')</code></pre>
-<p>[Return to <a href="#table-of-content">Table of Content</a>]</p>
-<hr />
-</div>
-<div id="handle-missing-values" class="section level2">
-<h2>Handle Missing Values</h2>
-<pre class="r"><code>x &lt;- c(1, 2, NA, 4, NA, 5)
-bad &lt;- is.na(x)
-x[!bad]</code></pre>
-<pre><code>## [1] 1 2 4 5</code></pre>
-<pre class="r"><code>y &lt;- c('a', 'b', 'd', NA, NA, 'f')
-good &lt;- complete.cases(x, y)
-x[good]</code></pre>
-<pre><code>## [1] 1 2 5</code></pre>
-<p><code>complete.cases</code> can also be used with dataframes: <code>complete.cases(dataframe_object)</code></p>
 <p>[Return to <a href="#table-of-content">Table of Content</a>]</p>
 <hr />
 </div>
@@ -220,8 +207,9 @@ for(i in seq_along(x)) {
 <li><code>sapply</code></li>
 <li><code>vapply</code></li>
 <li><code>mapply</code></li>
-<li><code>tapply</code> (related function: <code>split</code>) <em>Note</em>: <code>tapply</code> splits an atomic object, typically a vector; for a dataframe, use <code>split</code> combined with <code>lapply</code> or <code>sapply</code>. e.g.</li>
+<li><code>tapply</code> (related function: <code>split</code>)</li>
 </ul>
+<p><em>Note</em>: <code>tapply</code> splits an atomic object, typically a vector; for a dataframe, use <code>split</code> combined with <code>lapply</code> or <code>sapply</code>. e.g.</p>
 <pre class="r"><code>library(datasets)
 s &lt;- split(airquality, airquality$Month)
 lapply(s, function(x) {colMeans(x[, c('Ozone', 'Solar.R', 'Wind')])})</code></pre>
@@ -250,85 +238,6 @@ lapply(s, function(x) {colMeans(x[, c('Ozone', 'Solar.R', 'Wind')])})</code></pr
 <p>This is because <code>length(dataframe)</code> return the number of columns in the dataframe (not the number of rows).</p>
 <p>[Return to <a href="#table-of-content">Table of Content</a>]</p>
 <hr />
-</div>
-<div id="factor" class="section level2">
-<h2>Factor</h2>
-<pre class="r"><code>x &lt;- factor(c(&quot;yes&quot;, &quot;yes&quot;, &quot;no&quot;, &quot;yes&quot;, &quot;no&quot;), levels = c(&quot;yes&quot;, &quot;no&quot;))
-x</code></pre>
-<pre><code>## [1] yes yes no  yes no 
-## Levels: yes no</code></pre>
-<pre class="r"><code>unclass(x)</code></pre>
-<pre><code>## [1] 1 1 2 1 2
-## attr(,&quot;levels&quot;)
-## [1] &quot;yes&quot; &quot;no&quot;</code></pre>
-<div id="generate-factor-levels" class="section level4">
-<h4>generate factor levels</h4>
-<pre class="r"><code>f &lt;- gl(2, 5)
-f</code></pre>
-<pre><code>##  [1] 1 1 1 1 1 2 2 2 2 2
-## Levels: 1 2</code></pre>
-</div>
-<div id="compute-factor-interactions" class="section level4">
-<h4>compute factor interactions</h4>
-<pre class="r"><code>x &lt;- rnorm(10)
-f1 &lt;- gl(5, 2)
-f2 &lt;- gl(2, 5)
-interaction(f1, f2)</code></pre>
-<pre><code>##  [1] 1.1 1.1 2.1 2.1 3.1 3.2 4.2 4.2 5.2 5.2
-## Levels: 1.1 2.1 3.1 4.1 5.1 1.2 2.2 3.2 4.2 5.2</code></pre>
-<p>When more than one factors are put in a list, <code>split</code> will call <code>interaction</code> automatically:</p>
-<pre class="r"><code>split(x, list(f1, f2))</code></pre>
-<pre><code>## $`1.1`
-## [1]  0.5750097 -1.4124722
-## 
-## $`2.1`
-## [1] 1.479401 1.814099
-## 
-## $`3.1`
-## [1] 0.9479356
-## 
-## $`4.1`
-## numeric(0)
-## 
-## $`5.1`
-## numeric(0)
-## 
-## $`1.2`
-## numeric(0)
-## 
-## $`2.2`
-## numeric(0)
-## 
-## $`3.2`
-## [1] 0.54629
-## 
-## $`4.2`
-## [1] -0.1817811 -1.4288090
-## 
-## $`5.2`
-## [1] -0.9694417  0.5361513</code></pre>
-<p>Drop empty levels:</p>
-<pre class="r"><code>split(x, list(f1, f2), drop = TRUE)</code></pre>
-<pre><code>## $`1.1`
-## [1]  0.5750097 -1.4124722
-## 
-## $`2.1`
-## [1] 1.479401 1.814099
-## 
-## $`3.1`
-## [1] 0.9479356
-## 
-## $`3.2`
-## [1] 0.54629
-## 
-## $`4.2`
-## [1] -0.1817811 -1.4288090
-## 
-## $`5.2`
-## [1] -0.9694417  0.5361513</code></pre>
-<p>[Return to <a href="#table-of-content">Table of Content</a>]</p>
-<hr />
-</div>
 </div>
 <div id="debugging-tools" class="section level2">
 <h2>Debugging Tools</h2>
@@ -363,8 +272,7 @@ n  # for the next line</code></pre>
 <li><a href="#read-html-webpages">Read HTML (Webpages)</a></li>
 <li><a href="#read-from-apis">Read from APIs</a></li>
 <li><a href="#readwrite-json">Read/Write JSON</a></li>
-<li><a href="#read-from-mysql">Read from MySQL</a><br />
-</li>
+<li><a href="#read-from-mysql">Read from MySQL</a></li>
 <li><a href="#read-from-hdf5">Read from HDF5</a></li>
 </ul>
 <div id="further-reading" class="section level3">
@@ -506,9 +414,9 @@ head(html)</code></pre>
 <p>Parse HTML:</p>
 <pre class="r"><code>library(XML)
 doc &lt;- htmlTreeParse(html, useInternalNodes = TRUE)
-links &lt;- xpathSApply(doc, 
-                     '//div[@class=&quot;views-field views-field-title&quot;]/span[@class=&quot;field-content&quot;]/a', 
-                     xmlGetAttr, 
+links &lt;- xpathSApply(doc,
+                     '//div[@class=&quot;views-field views-field-title&quot;]/span[@class=&quot;field-content&quot;]/a',
+                     xmlGetAttr,
                      name='href')
 links</code></pre>
 <pre><code>##  [1] &quot;/events/easter-monday&quot;                                                                                
@@ -544,7 +452,7 @@ html2 &lt;- GET('https://nationalzoo.si.edu/news/webcam/archive/2238')
 content2 &lt;- content(html2, as='text')
 
 parsedHtml &lt;- htmlParse(content2, asText=TRUE)
-xpathSApply(parsedHtml, 
+xpathSApply(parsedHtml,
             '//div[@class=&quot;views-field views-field-title&quot;]/span[@class=&quot;field-content&quot;]/a',
             xmlGetAttr,
             name='href')</code></pre>
@@ -653,22 +561,14 @@ head(iris2)</code></pre>
 <h3>Read from MySQL</h3>
 <p>Functions covered:</p>
 <ul>
-<li><code>dbConnect</code><br />
-</li>
-<li><code>dbDisconnect</code><br />
-</li>
-<li><code>dbListTables</code><br />
-</li>
-<li><code>dbReadTable</code><br />
-</li>
-<li><code>dbListFields</code><br />
-</li>
-<li><code>dbGetQuery</code><br />
-</li>
-<li><code>dbSendQuery</code><br />
-</li>
-<li><code>dbFetch</code><br />
-</li>
+<li><code>dbConnect</code></li>
+<li><code>dbDisconnect</code></li>
+<li><code>dbListTables</code></li>
+<li><code>dbReadTable</code></li>
+<li><code>dbListFields</code></li>
+<li><code>dbGetQuery</code></li>
+<li><code>dbSendQuery</code></li>
+<li><code>dbFetch</code></li>
 <li><code>dbClearResult</code></li>
 </ul>
 <p>Further reading:</p>
@@ -689,7 +589,7 @@ dbDisconnect(ucscDb)</code></pre>
   </script>
 </div>
 <p>Connect to a specific database:</p>
-<pre class="r"><code>hg19 &lt;- dbConnect(MySQL(), user='genome', host='genome-mysql.soe.ucsc.edu', 
+<pre class="r"><code>hg19 &lt;- dbConnect(MySQL(), user='genome', host='genome-mysql.soe.ucsc.edu',
                   db='hg19')</code></pre>
 <p>List all tables:</p>
 <pre class="r"><code>allTables &lt;- dbListTables(hg19)
@@ -721,16 +621,16 @@ head(affyData)</code></pre>
   </script>
 </div>
 <p>Select a specific subset:</p>
-<pre class="r"><code>query.string &lt;- 
-'SELECT * from affyU133Plus2 
+<pre class="r"><code>query.string &lt;-
+'SELECT * from affyU133Plus2
 WHERE misMatches BETWEEN 1 AND 3'
 
 affyMis &lt;- dbGetQuery(hg19, query.string, n=10)
 dim(affyMis)</code></pre>
 <pre><code>## [1] 10 22</code></pre>
 <p><strong>Note:</strong> <code>dbGetQuery()</code> is equivalent to <code>dbSendQuery()</code>, then <code>dbFetch()</code>, ensuring that the result is always free-d by <code>dbClearResult()</code>.</p>
-<pre class="r"><code>query.string &lt;- 
-'SELECT * from affyU133Plus2 
+<pre class="r"><code>query.string &lt;-
+'SELECT * from affyU133Plus2
 WHERE misMatches BETWEEN 1 AND 3'
 
 query &lt;- dbSendQuery(hg19, query.string)
@@ -795,7 +695,7 @@ readA</code></pre>
 ## [4,]    4    9
 ## [5,]    5   10</code></pre>
 <p>Read/write in chunks:</p>
-<pre class="r"><code>h5write(c(12, 13, 14), h5.file, 'foo/A', 
+<pre class="r"><code>h5write(c(12, 13, 14), h5.file, 'foo/A',
         index=list(1:3, 1))  # write to the first 3 rows in the first column
 h5read(h5.file, 'foo/A')</code></pre>
 <pre><code>##      [,1] [,2]
@@ -813,14 +713,220 @@ h5read(h5.file, 'foo/A')</code></pre>
 <hr />
 </div>
 </div>
-<div id="the-data.table-package" class="section level2">
-<h2>The <code>data.table</code> Package</h2>
+<div id="exploratory-data-analysis" class="section level2">
+<h2>Exploratory Data Analysis</h2>
+<div id="what-the-actual-data-looks-like" class="section level4">
+<h4>What the actual data looks like</h4>
+<pre class="r"><code>data(&quot;UCBAdmissions&quot;)
+df &lt;- as.data.frame(UCBAdmissions)
+
+head(df)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Admit"],"name":[1],"type":["fctr"],"align":["left"]},{"label":["Gender"],"name":[2],"type":["fctr"],"align":["left"]},{"label":["Dept"],"name":[3],"type":["fctr"],"align":["left"]},{"label":["Freq"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"Admitted","2":"Male","3":"A","4":"512","_rn_":"1"},{"1":"Rejected","2":"Male","3":"A","4":"313","_rn_":"2"},{"1":"Admitted","2":"Female","3":"A","4":"89","_rn_":"3"},{"1":"Rejected","2":"Female","3":"A","4":"19","_rn_":"4"},{"1":"Admitted","2":"Male","3":"B","4":"353","_rn_":"5"},{"1":"Rejected","2":"Male","3":"B","4":"207","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code>tail(df, 3)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Admit"],"name":[1],"type":["fctr"],"align":["left"]},{"label":["Gender"],"name":[2],"type":["fctr"],"align":["left"]},{"label":["Dept"],"name":[3],"type":["fctr"],"align":["left"]},{"label":["Freq"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"Rejected","2":"Male","3":"F","4":"351","_rn_":"22"},{"1":"Admitted","2":"Female","3":"F","4":"24","_rn_":"23"},{"1":"Rejected","2":"Female","3":"F","4":"317","_rn_":"24"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div id="numbers-of-rowscolumns-names-of-rowscolumns-the-class-of-each-column-any-missing-values-any-duplicates" class="section level4">
+<h4>Numbers of rows/columns, names of rows/columns, the class of each column, any missing values, any duplicates</h4>
+<pre class="r"><code>str(df)  # info() in Python</code></pre>
+<pre><code>## 'data.frame':    24 obs. of  4 variables:
+##  $ Admit : Factor w/ 2 levels &quot;Admitted&quot;,&quot;Rejected&quot;: 1 2 1 2 1 2 1 2 1 2 ...
+##  $ Gender: Factor w/ 2 levels &quot;Male&quot;,&quot;Female&quot;: 1 1 2 2 1 1 2 2 1 1 ...
+##  $ Dept  : Factor w/ 6 levels &quot;A&quot;,&quot;B&quot;,&quot;C&quot;,&quot;D&quot;,..: 1 1 1 1 2 2 2 2 3 3 ...
+##  $ Freq  : num  512 313 89 19 353 207 17 8 120 205 ...</code></pre>
+<pre class="r"><code>rownames(df)  # df.index in Python</code></pre>
+<pre><code>##  [1] &quot;1&quot;  &quot;2&quot;  &quot;3&quot;  &quot;4&quot;  &quot;5&quot;  &quot;6&quot;  &quot;7&quot;  &quot;8&quot;  &quot;9&quot;  &quot;10&quot; &quot;11&quot; &quot;12&quot; &quot;13&quot; &quot;14&quot;
+## [15] &quot;15&quot; &quot;16&quot; &quot;17&quot; &quot;18&quot; &quot;19&quot; &quot;20&quot; &quot;21&quot; &quot;22&quot; &quot;23&quot; &quot;24&quot;</code></pre>
+<pre class="r"><code>names(df)  # df.columns in Python</code></pre>
+<pre><code>## [1] &quot;Admit&quot;  &quot;Gender&quot; &quot;Dept&quot;   &quot;Freq&quot;</code></pre>
+<pre class="r"><code># missing values
+sum(is.na(df$Admit))</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>colSums(is.na(df))</code></pre>
+<pre><code>##  Admit Gender   Dept   Freq 
+##      0      0      0      0</code></pre>
+</div>
+<div id="distributions" class="section level4">
+<h4>Distributions</h4>
+<ul>
+<li>Quantitative variables: quantiles</li>
+<li>Qualatative variables: number of levels; count for each level</li>
+</ul>
+<pre class="r"><code>summary(df)  # describe() in Python</code></pre>
+<pre><code>##       Admit       Gender   Dept       Freq      
+##  Admitted:12   Male  :12   A:4   Min.   :  8.0  
+##  Rejected:12   Female:12   B:4   1st Qu.: 80.0  
+##                            C:4   Median :170.0  
+##                            D:4   Mean   :188.6  
+##                            E:4   3rd Qu.:302.5  
+##                            F:4   Max.   :512.0</code></pre>
+<pre class="r"><code>quantile(df$Freq, na.rm=TRUE, probs=c(0, 0.25, 0.5, 0.75, 1))</code></pre>
+<pre><code>##    0%   25%   50%   75%  100% 
+##   8.0  80.0 170.0 302.5 512.0</code></pre>
+<pre class="r"><code>table(df$Admit, useNA='ifany')  # value_counts in Python</code></pre>
+<pre><code>## 
+## Admitted Rejected 
+##       12       12</code></pre>
+<pre class="r"><code>table(df$Gender, df$Dept)</code></pre>
+<pre><code>##         
+##          A B C D E F
+##   Male   2 2 2 2 2 2
+##   Female 2 2 2 2 2 2</code></pre>
+</div>
+<div id="crosstab" class="section level4">
+<h4>Crosstab</h4>
+<pre class="r"><code>xtabs(Freq ~ Gender + Admit, data=df)</code></pre>
+<pre><code>##         Admit
+## Gender   Admitted Rejected
+##   Male       1198     1493
+##   Female      557     1278</code></pre>
+<p>[Return to <a href="#table-of-content">Table of Content</a>]</p>
+<hr />
+</div>
+</div>
+<div id="data-wrangling" class="section level2">
+<h2>Data Wrangling</h2>
+<ul>
+<li><a href="#handle-missing-values">Handle Missing Values</a></li>
+<li><a href="#factor">Factor</a></li>
+<li><a href="#data.table"><code>data.table</code></a></li>
+<li><a href="#plyr"><code>plyr</code></a></li>
+<li><a href="#dplyr"><code>dplyr</code></a></li>
+<li><a href="#reshape-data">Reshape Data</a></li>
+<li><a href="#merge-data-1">Merge Data</a></li>
+</ul>
+<div id="handle-missing-values" class="section level3">
+<h3>Handle Missing Values</h3>
+<pre class="r"><code>x &lt;- c(1, 2, NA, 4, NA, 5)
+bad &lt;- is.na(x)
+x[!bad]</code></pre>
+<pre><code>## [1] 1 2 4 5</code></pre>
+<pre class="r"><code>y &lt;- c('a', 'b', 'd', NA, NA, 'f')
+good &lt;- complete.cases(x, y)
+x[good]</code></pre>
+<pre><code>## [1] 1 2 5</code></pre>
+<p><code>complete.cases</code> can also be used with dataframes: <code>complete.cases(dataframe_object)</code></p>
+<p>When subsetting a vector/data frame containing <code>NA</code> using conditional, use <code>which</code>:</p>
+<pre class="r"><code>x[which(x&gt;2)]</code></pre>
+<pre><code>## [1] 4 5</code></pre>
+<pre class="r"><code># compare with
+x[x&gt;2]</code></pre>
+<pre><code>## [1] NA  4 NA  5</code></pre>
+<p>[Return to <a href="#table-of-content">Table of Content</a>]</p>
+<hr />
+</div>
+<div id="factor" class="section level3">
+<h3>Factor</h3>
+<pre class="r"><code>x &lt;- factor(c(&quot;yes&quot;, &quot;yes&quot;, &quot;no&quot;, &quot;yes&quot;, &quot;no&quot;), levels = c(&quot;yes&quot;, &quot;no&quot;))
+x</code></pre>
+<pre><code>## [1] yes yes no  yes no 
+## Levels: yes no</code></pre>
+<pre class="r"><code>unclass(x)</code></pre>
+<pre><code>## [1] 1 1 2 1 2
+## attr(,&quot;levels&quot;)
+## [1] &quot;yes&quot; &quot;no&quot;</code></pre>
+<pre class="r"><code>relevel(x, ref='no')</code></pre>
+<pre><code>## [1] yes yes no  yes no 
+## Levels: no yes</code></pre>
+<div id="generate-factor-levels" class="section level4">
+<h4>Generate factor levels</h4>
+<pre class="r"><code>f &lt;- gl(2, 5)
+f</code></pre>
+<pre><code>##  [1] 1 1 1 1 1 2 2 2 2 2
+## Levels: 1 2</code></pre>
+</div>
+<div id="compute-factor-interactions" class="section level4">
+<h4>Compute factor interactions</h4>
+<pre class="r"><code>x &lt;- rnorm(10)
+f1 &lt;- gl(5, 2)
+f2 &lt;- gl(2, 5)
+interaction(f1, f2)</code></pre>
+<pre><code>##  [1] 1.1 1.1 2.1 2.1 3.1 3.2 4.2 4.2 5.2 5.2
+## Levels: 1.1 2.1 3.1 4.1 5.1 1.2 2.2 3.2 4.2 5.2</code></pre>
+</div>
+<div id="split" class="section level4">
+<h4>Split</h4>
+<p>When more than one factors are put in a list, <code>split</code> will call <code>interaction</code> automatically:</p>
+<pre class="r"><code>split(x, list(f1, f2))</code></pre>
+<pre><code>## $`1.1`
+## [1]  1.516168 -1.150079
+## 
+## $`2.1`
+## [1] -1.3234174  0.5212159
+## 
+## $`3.1`
+## [1] -0.4796982
+## 
+## $`4.1`
+## numeric(0)
+## 
+## $`5.1`
+## numeric(0)
+## 
+## $`1.2`
+## numeric(0)
+## 
+## $`2.2`
+## numeric(0)
+## 
+## $`3.2`
+## [1] -1.333858
+## 
+## $`4.2`
+## [1]  0.7608664 -0.2744699
+## 
+## $`5.2`
+## [1] 0.009267515 0.545557156</code></pre>
+<p>Drop empty levels:</p>
+<pre class="r"><code>split(x, list(f1, f2), drop = TRUE)</code></pre>
+<pre><code>## $`1.1`
+## [1]  1.516168 -1.150079
+## 
+## $`2.1`
+## [1] -1.3234174  0.5212159
+## 
+## $`3.1`
+## [1] -0.4796982
+## 
+## $`3.2`
+## [1] -1.333858
+## 
+## $`4.2`
+## [1]  0.7608664 -0.2744699
+## 
+## $`5.2`
+## [1] 0.009267515 0.545557156</code></pre>
+</div>
+<div id="create-binary-variables" class="section level4">
+<h4>Create binary variables:</h4>
+<pre class="r"><code>ifelse(test, yes, no)</code></pre>
+</div>
+<div id="create-categorical-variables" class="section level4">
+<h4>Create categorical variables</h4>
+<pre class="r"><code>cut(x, breaks)
+
+# Alternatively
+library(Hmisc)
+cut2(x, g=4)</code></pre>
+<p>[Return to <a href="#table-of-content">Table of Content</a>]</p>
+<hr />
+</div>
+</div>
+<div id="data.table" class="section level3">
+<h3><code>data.table</code></h3>
 <pre class="r"><code>library(data.table)</code></pre>
 <pre class="r"><code>DT &lt;- data.table(x=rnorm(9), y=rep(c('a', 'b', 'c'), each=3), z=rnorm(9))
 head(DT, 3)</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["x"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["y"],"name":[2],"type":["chr"],"align":["left"]},{"label":["z"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"1.0429532","2":"a","3":"-0.8449138"},{"1":"-0.7920280","2":"a","3":"1.3774914"},{"1":"-0.8539064","2":"a","3":"-1.2071656"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["x"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["y"],"name":[2],"type":["chr"],"align":["left"]},{"label":["z"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.9761841","2":"a","3":"-0.07361692"},{"1":"-0.5379922","2":"a","3":"2.02815483"},{"1":"1.0515102","2":"a","3":"-0.86883869"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <p>See all the data tables in memory:</p>
@@ -832,32 +938,32 @@ head(DT, 3)</code></pre>
 <pre class="r"><code>DT[2,]</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["x"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["y"],"name":[2],"type":["chr"],"align":["left"]},{"label":["z"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"-0.792028","2":"a","3":"1.377491"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["x"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["y"],"name":[2],"type":["chr"],"align":["left"]},{"label":["z"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"-0.5379922","2":"a","3":"2.028155"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <pre class="r"><code>DT[DT$y=='a',]</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["x"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["y"],"name":[2],"type":["chr"],"align":["left"]},{"label":["z"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"1.0429532","2":"a","3":"-0.8449138"},{"1":"-0.7920280","2":"a","3":"1.3774914"},{"1":"-0.8539064","2":"a","3":"-1.2071656"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["x"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["y"],"name":[2],"type":["chr"],"align":["left"]},{"label":["z"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.9761841","2":"a","3":"-0.07361692"},{"1":"-0.5379922","2":"a","3":"2.02815483"},{"1":"1.0515102","2":"a","3":"-0.86883869"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <pre class="r"><code>DT[c(2,3)]</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["x"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["y"],"name":[2],"type":["chr"],"align":["left"]},{"label":["z"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"-0.7920280","2":"a","3":"1.377491"},{"1":"-0.8539064","2":"a","3":"-1.207166"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["x"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["y"],"name":[2],"type":["chr"],"align":["left"]},{"label":["z"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"-0.5379922","2":"a","3":"2.0281548"},{"1":"1.0515102","2":"a","3":"-0.8688387"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <p>Columns expressions:</p>
 <pre class="r"><code>DT[, c(2,3)]</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["y"],"name":[1],"type":["chr"],"align":["left"]},{"label":["z"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"a","2":"-0.8449138"},{"1":"a","2":"1.3774914"},{"1":"a","2":"-1.2071656"},{"1":"b","2":"-1.2417970"},{"1":"b","2":"2.0469804"},{"1":"b","2":"-1.5662701"},{"1":"c","2":"-1.0216128"},{"1":"c","2":"0.6376754"},{"1":"c","2":"0.1809392"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["y"],"name":[1],"type":["chr"],"align":["left"]},{"label":["z"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"a","2":"-0.07361692"},{"1":"a","2":"2.02815483"},{"1":"a","2":"-0.86883869"},{"1":"b","2":"-0.58071540"},{"1":"b","2":"0.07017068"},{"1":"b","2":"-0.48185274"},{"1":"c","2":"-0.65702667"},{"1":"c","2":"-1.58038519"},{"1":"c","2":"-0.70850518"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <pre class="r"><code>DT[, list(mean(x), sum(z))]</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["V1"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["V2"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"-0.3893887","2":"-1.638673"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["V1"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["V2"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.314136","2":"-2.852615"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <pre class="r"><code>DT[, table(y)]</code></pre>
@@ -879,7 +985,7 @@ DT[, b:= mean(x+w), by=a]
 DT[, .N, by=a]</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["a"],"name":[1],"type":["lgl"],"align":["right"]},{"label":["N"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"TRUE","2":"1"},{"1":"FALSE","2":"8"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["a"],"name":[1],"type":["lgl"],"align":["right"]},{"label":["N"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"TRUE","2":"5"},{"1":"FALSE","2":"4"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <p>Keys</p>
@@ -888,7 +994,7 @@ setkey(DT, x)
 DT['a']</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["x"],"name":[1],"type":["chr"],"align":["left"]},{"label":["y"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"a","2":"-0.01540142"},{"1":"a","2":"-1.70351796"},{"1":"a","2":"-1.08069083"},{"1":"a","2":"0.24764857"},{"1":"a","2":"0.20336785"},{"1":"a","2":"0.30231392"},{"1":"a","2":"-0.99724448"},{"1":"a","2":"-2.66363747"},{"1":"a","2":"-1.71653330"},{"1":"a","2":"-0.24713879"},{"1":"a","2":"-1.27584517"},{"1":"a","2":"-0.69769671"},{"1":"a","2":"0.01327808"},{"1":"a","2":"0.78861955"},{"1":"a","2":"-2.47837541"},{"1":"a","2":"1.23926591"},{"1":"a","2":"1.44712888"},{"1":"a","2":"-0.70660900"},{"1":"a","2":"1.18189940"},{"1":"a","2":"-0.85976425"},{"1":"a","2":"-0.09916242"},{"1":"a","2":"1.16256389"},{"1":"a","2":"-0.26727812"},{"1":"a","2":"-0.50669596"},{"1":"a","2":"0.98654265"},{"1":"a","2":"0.52330271"},{"1":"a","2":"-0.82823290"},{"1":"a","2":"0.77687713"},{"1":"a","2":"-0.26604094"},{"1":"a","2":"0.18893009"},{"1":"a","2":"0.56693246"},{"1":"a","2":"0.44813875"},{"1":"a","2":"0.79157930"},{"1":"a","2":"-0.29018087"},{"1":"a","2":"0.64307234"},{"1":"a","2":"0.45269067"},{"1":"a","2":"0.18725915"},{"1":"a","2":"-0.98793851"},{"1":"a","2":"1.20769739"},{"1":"a","2":"-0.20988797"},{"1":"a","2":"0.58180197"},{"1":"a","2":"0.61669309"},{"1":"a","2":"2.31295400"},{"1":"a","2":"-0.04136163"},{"1":"a","2":"-0.43511969"},{"1":"a","2":"-0.67022647"},{"1":"a","2":"0.29393168"},{"1":"a","2":"0.20204190"},{"1":"a","2":"0.10170326"},{"1":"a","2":"-2.77544428"},{"1":"a","2":"-0.33209183"},{"1":"a","2":"-1.70932898"},{"1":"a","2":"-0.59976614"},{"1":"a","2":"1.00392316"},{"1":"a","2":"0.41286723"},{"1":"a","2":"-0.25334414"},{"1":"a","2":"-1.02992974"},{"1":"a","2":"0.97372823"},{"1":"a","2":"1.22220156"},{"1":"a","2":"0.77852734"},{"1":"a","2":"1.49146935"},{"1":"a","2":"0.67298207"},{"1":"a","2":"-0.26213533"},{"1":"a","2":"-0.30273217"},{"1":"a","2":"1.51673310"},{"1":"a","2":"-0.41670375"},{"1":"a","2":"0.03671206"},{"1":"a","2":"0.68380870"},{"1":"a","2":"-0.92582578"},{"1":"a","2":"1.26702901"},{"1":"a","2":"0.71418377"},{"1":"a","2":"0.10680065"},{"1":"a","2":"0.11264730"},{"1":"a","2":"-0.36281149"},{"1":"a","2":"1.87362389"},{"1":"a","2":"1.14929523"},{"1":"a","2":"0.52210092"},{"1":"a","2":"0.14639610"},{"1":"a","2":"-1.35556979"},{"1":"a","2":"-0.09045848"},{"1":"a","2":"-2.04950424"},{"1":"a","2":"-0.89812303"},{"1":"a","2":"-1.81955505"},{"1":"a","2":"-0.81795944"},{"1":"a","2":"1.27661763"},{"1":"a","2":"-0.12277960"},{"1":"a","2":"0.71001691"},{"1":"a","2":"-1.44455405"},{"1":"a","2":"0.71251511"},{"1":"a","2":"0.20754343"},{"1":"a","2":"0.91864298"},{"1":"a","2":"0.38525353"},{"1":"a","2":"0.60871124"},{"1":"a","2":"0.50961706"},{"1":"a","2":"-0.57584747"},{"1":"a","2":"3.23291858"},{"1":"a","2":"-1.23467611"},{"1":"a","2":"-0.24215077"},{"1":"a","2":"-0.17551570"},{"1":"a","2":"-0.05433503"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["x"],"name":[1],"type":["chr"],"align":["left"]},{"label":["y"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"a","2":"-0.12588053"},{"1":"a","2":"0.62421554"},{"1":"a","2":"-0.23420513"},{"1":"a","2":"0.06886389"},{"1":"a","2":"0.47112854"},{"1":"a","2":"0.79446136"},{"1":"a","2":"0.85605091"},{"1":"a","2":"1.53338574"},{"1":"a","2":"-0.86395795"},{"1":"a","2":"-0.95810377"},{"1":"a","2":"-1.78153980"},{"1":"a","2":"0.16625992"},{"1":"a","2":"-1.15116737"},{"1":"a","2":"-0.41581293"},{"1":"a","2":"1.96561939"},{"1":"a","2":"2.21264218"},{"1":"a","2":"-0.20894113"},{"1":"a","2":"0.44070723"},{"1":"a","2":"-0.78044696"},{"1":"a","2":"0.65885499"},{"1":"a","2":"0.56528983"},{"1":"a","2":"-1.53574178"},{"1":"a","2":"1.73481854"},{"1":"a","2":"0.90612128"},{"1":"a","2":"0.07545806"},{"1":"a","2":"0.29141388"},{"1":"a","2":"0.98534433"},{"1":"a","2":"-0.78838125"},{"1":"a","2":"0.40488078"},{"1":"a","2":"0.64896869"},{"1":"a","2":"1.10431335"},{"1":"a","2":"-1.55896586"},{"1":"a","2":"0.36951789"},{"1":"a","2":"0.92892589"},{"1":"a","2":"1.12805071"},{"1":"a","2":"0.48403568"},{"1":"a","2":"2.26047027"},{"1":"a","2":"-0.52890363"},{"1":"a","2":"0.50655833"},{"1":"a","2":"0.94402926"},{"1":"a","2":"-1.01696206"},{"1":"a","2":"0.62440242"},{"1":"a","2":"0.09960560"},{"1":"a","2":"-0.37213242"},{"1":"a","2":"1.09217505"},{"1":"a","2":"0.25710905"},{"1":"a","2":"1.06710366"},{"1":"a","2":"2.15406614"},{"1":"a","2":"1.16593949"},{"1":"a","2":"-1.16648858"},{"1":"a","2":"-0.72569201"},{"1":"a","2":"0.90600866"},{"1":"a","2":"-1.60504504"},{"1":"a","2":"0.29653183"},{"1":"a","2":"-0.87499481"},{"1":"a","2":"-0.20998112"},{"1":"a","2":"0.37809390"},{"1":"a","2":"0.55093470"},{"1":"a","2":"-0.44718696"},{"1":"a","2":"0.02864624"},{"1":"a","2":"-1.29622443"},{"1":"a","2":"0.26325645"},{"1":"a","2":"0.64833829"},{"1":"a","2":"0.57062168"},{"1":"a","2":"0.26077278"},{"1":"a","2":"2.57355648"},{"1":"a","2":"0.64924885"},{"1":"a","2":"-0.46401777"},{"1":"a","2":"0.28004327"},{"1":"a","2":"-1.05135998"},{"1":"a","2":"1.29602818"},{"1":"a","2":"0.28357178"},{"1":"a","2":"-2.71762721"},{"1":"a","2":"-0.90281101"},{"1":"a","2":"0.44257207"},{"1":"a","2":"1.49725887"},{"1":"a","2":"-1.22399810"},{"1":"a","2":"0.89928343"},{"1":"a","2":"-0.84756486"},{"1":"a","2":"-1.14158843"},{"1":"a","2":"0.30709215"},{"1":"a","2":"1.76886418"},{"1":"a","2":"-1.22792535"},{"1":"a","2":"-1.82691266"},{"1":"a","2":"-0.05529846"},{"1":"a","2":"0.09837367"},{"1":"a","2":"-0.61684189"},{"1":"a","2":"0.66633246"},{"1":"a","2":"1.51153223"},{"1":"a","2":"-0.77805636"},{"1":"a","2":"0.12710024"},{"1":"a","2":"1.67389403"},{"1":"a","2":"-0.72594773"},{"1":"a","2":"-0.45541013"},{"1":"a","2":"-0.67841101"},{"1":"a","2":"-1.05692552"},{"1":"a","2":"0.36048889"},{"1":"a","2":"0.21219467"},{"1":"a","2":"0.12803668"},{"1":"a","2":"0.32810793"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <p>Use keys to facilitate joins:</p>
@@ -906,6 +1012,104 @@ merge(DT1, DT2)</code></pre>
 <pre class="r"><code>fread(filename)</code></pre>
 <p>[Return to <a href="#table-of-content">Table of Content</a>]</p>
 <hr />
+</div>
+<div id="plyr" class="section level3">
+<h3><code>plyr</code></h3>
+<pre class="r"><code>library(plyr)</code></pre>
+<div id="order-a-dataframe-by-certain-variables" class="section level4">
+<h4>Order a dataframe by certain variables</h4>
+<pre class="r"><code>arrange(dataframe, var1)
+# use base R:
+dataframe[order(dataframe$var1), ]
+
+# in descending order:
+arrange(dataframe, desc(var1))</code></pre>
+</div>
+<div id="copy-a-data-frame-and-add-new-variables" class="section level4">
+<h4>Copy a data frame and add new variables</h4>
+<pre class="r"><code>df2 &lt;- mutate(df1, newCol=cut2(oldCol, g=4))</code></pre>
+</div>
+<div id="split-apply-combine" class="section level4">
+<h4>Split-apply-combine</h4>
+<pre class="r"><code>str(InsectSprays, 3)</code></pre>
+<pre><code>## 'data.frame':    72 obs. of  2 variables:
+##  $ count: num  10 7 20 14 14 12 10 23 17 20 ...
+##  $ spray: Factor w/ 6 levels &quot;A&quot;,&quot;B&quot;,&quot;C&quot;,&quot;D&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...</code></pre>
+<pre class="r"><code>ddply(InsectSprays, .(spray), summarize, sum=sum(count))</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["spray"],"name":[1],"type":["fctr"],"align":["left"]},{"label":["sum"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"A","2":"174"},{"1":"B","2":"184"},{"1":"C","2":"25"},{"1":"D","2":"59"},{"1":"E","2":"42"},{"1":"F","2":"200"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>Or, maintain the dimension so that a new variable can be created:</p>
+<pre class="r"><code>spraySums &lt;- ddply(InsectSprays, .(spray), summarize, sum=ave(count, FUN=sum))
+dim(spraySums)</code></pre>
+<pre><code>## [1] 72  2</code></pre>
+<pre class="r"><code>head(spraySums)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["spray"],"name":[1],"type":["fctr"],"align":["left"]},{"label":["sum"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"A","2":"174","_rn_":"1"},{"1":"A","2":"174","_rn_":"2"},{"1":"A","2":"174","_rn_":"3"},{"1":"A","2":"174","_rn_":"4"},{"1":"A","2":"174","_rn_":"5"},{"1":"A","2":"174","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div id="merge-data" class="section level4">
+<h4>Merge data</h4>
+<p>Compared with <code>merge</code> in base R, it is faster, but less full featured (defaults to left join)</p>
+<pre class="r"><code>join(x, y, by = NULL, type = &quot;left&quot;, match = &quot;all&quot;)</code></pre>
+<p>Merge multiple data frames (which is more difficult with <code>merge</code>)</p>
+<pre class="r"><code>df1 &lt;- data.frame(id=sample(1:10), x=rnorm(10))
+df2 &lt;- data.frame(id=sample(1:10), y=rnorm(10))
+df3 &lt;- data.frame(id=sample(1:10), z=rnorm(10))
+dfList = list(df1, df2, df3)
+join_all(dfList)</code></pre>
+<pre><code>## Joining by: id
+## Joining by: id</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["id"],"name":[1],"type":["int"],"align":["right"]},{"label":["x"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["y"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["z"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"-0.4096968","3":"-0.9826849","4":"-0.07129851"},{"1":"4","2":"1.3398516","3":"-1.3763790","4":"-0.55434854"},{"1":"9","2":"-0.1511013","3":"0.7310789","4":"0.05236930"},{"1":"2","2":"-0.4308853","3":"0.7633944","4":"-1.93044669"},{"1":"8","2":"0.6061991","3":"0.9803220","4":"-0.42762376"},{"1":"5","2":"0.7114115","3":"-1.2106784","4":"1.96805339"},{"1":"3","2":"0.5552810","3":"0.0213396","4":"0.64801474"},{"1":"6","2":"-0.5291275","3":"-0.7394865","4":"-1.54517009"},{"1":"7","2":"-0.7691801","3":"-0.6210996","4":"1.09647587"},{"1":"10","2":"-1.1138419","3":"-0.1843939","4":"-0.51063499"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<p>[Return to <a href="#table-of-content">Table of Content</a>]</p>
+<hr />
+</div>
+</div>
+<div id="dplyr" class="section level3">
+<h3><code>dplyr</code></h3>
+<ul>
+<li><code>select</code></li>
+<li><code>filter</code></li>
+<li><code>arrange</code></li>
+<li><code>rename</code><br />
+<code>rename(df, newName = oldName)</code></li>
+<li><code>mutate</code></li>
+<li><code>group_by</code></li>
+<li><code>summarize</code></li>
+<li><code>%&gt;%</code></li>
+</ul>
+<p>[Return to <a href="#table-of-content">Table of Content</a>]</p>
+<hr />
+</div>
+<div id="reshape-data" class="section level3">
+<h3>Reshape Data</h3>
+<pre class="r"><code>library(reshape2)</code></pre>
+<div id="melt-data-frames" class="section level4">
+<h4>Melt data frames</h4>
+<pre class="r"><code>melt(df, id, measure.vars)</code></pre>
+</div>
+<div id="cast-data-frames" class="section level4">
+<h4>Cast data frames</h4>
+<pre class="r"><code>dcast(data, formula, fun.aggregate)</code></pre>
+<p>See also: <code>acast</code></p>
+<p>[Return to <a href="#table-of-content">Table of Content</a>]</p>
+<hr />
+</div>
+</div>
+<div id="merge-data-1" class="section level3">
+<h3>Merge Data</h3>
+<p><code>merge</code> <code>intersect</code></p>
+<p>[Return to <a href="#table-of-content">Table of Content</a>]</p>
+<hr />
+</div>
 </div>
 <div id="plotting" class="section level2">
 <h2>Plotting</h2>
