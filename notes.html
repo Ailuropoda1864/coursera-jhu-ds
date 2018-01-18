@@ -143,6 +143,7 @@ $(document).ready(function () {
 <pre class="r"><code>?read.table
 help.search('data input')
 find('anova')
+help(package=lubridate)
 
 args('rnorm')
 formals(rnorm)
@@ -752,6 +753,9 @@ sum(is.na(df$Admit))</code></pre>
 <pre class="r"><code>colSums(is.na(df))</code></pre>
 <pre><code>##  Admit Gender   Dept   Freq 
 ##      0      0      0      0</code></pre>
+<pre class="r"><code># duplicates
+sum(duplicated(df))</code></pre>
+<pre><code>## [1] 0</code></pre>
 </div>
 <div id="distributions" class="section level4">
 <h4>Distributions</h4>
@@ -796,9 +800,13 @@ sum(is.na(df$Admit))</code></pre>
 <ul>
 <li><a href="#handle-missing-values">Handle Missing Values</a></li>
 <li><a href="#factor">Factor</a></li>
+<li><a href="#text">Text</a></li>
+<li><a href="#regex">RegEx</a></li>
+<li><a href="#datetime">Datetime</a></li>
 <li><a href="#data.table"><code>data.table</code></a></li>
 <li><a href="#plyr"><code>plyr</code></a></li>
 <li><a href="#dplyr"><code>dplyr</code></a></li>
+<li><a href="#tidyr"><code>tidyr</code></a></li>
 <li><a href="#reshape-data">Reshape Data</a></li>
 <li><a href="#merge-data-1">Merge Data</a></li>
 </ul>
@@ -856,13 +864,13 @@ interaction(f1, f2)</code></pre>
 <p>When more than one factors are put in a list, <code>split</code> will call <code>interaction</code> automatically:</p>
 <pre class="r"><code>split(x, list(f1, f2))</code></pre>
 <pre><code>## $`1.1`
-## [1]  1.516168 -1.150079
+## [1] -1.79064247  0.02740502
 ## 
 ## $`2.1`
-## [1] -1.3234174  0.5212159
+## [1] -0.8054998 -0.2820869
 ## 
 ## $`3.1`
-## [1] -0.4796982
+## [1] -0.3553161
 ## 
 ## $`4.1`
 ## numeric(0)
@@ -877,32 +885,32 @@ interaction(f1, f2)</code></pre>
 ## numeric(0)
 ## 
 ## $`3.2`
-## [1] -1.333858
+## [1] 0.01950587
 ## 
 ## $`4.2`
-## [1]  0.7608664 -0.2744699
+## [1]  0.6595320 -0.5181532
 ## 
 ## $`5.2`
-## [1] 0.009267515 0.545557156</code></pre>
+## [1] 1.0049508 0.4981508</code></pre>
 <p>Drop empty levels:</p>
 <pre class="r"><code>split(x, list(f1, f2), drop = TRUE)</code></pre>
 <pre><code>## $`1.1`
-## [1]  1.516168 -1.150079
+## [1] -1.79064247  0.02740502
 ## 
 ## $`2.1`
-## [1] -1.3234174  0.5212159
+## [1] -0.8054998 -0.2820869
 ## 
 ## $`3.1`
-## [1] -0.4796982
+## [1] -0.3553161
 ## 
 ## $`3.2`
-## [1] -1.333858
+## [1] 0.01950587
 ## 
 ## $`4.2`
-## [1]  0.7608664 -0.2744699
+## [1]  0.6595320 -0.5181532
 ## 
 ## $`5.2`
-## [1] 0.009267515 0.545557156</code></pre>
+## [1] 1.0049508 0.4981508</code></pre>
 </div>
 <div id="create-binary-variables" class="section level4">
 <h4>Create binary variables:</h4>
@@ -915,9 +923,60 @@ interaction(f1, f2)</code></pre>
 # Alternatively
 library(Hmisc)
 cut2(x, g=4)</code></pre>
+</div>
+</div>
+<div id="text" class="section level3">
+<h3>Text</h3>
+<ul>
+<li><code>tolower</code> / <code>toupper</code></li>
+<li><code>strsplit</code></li>
+<li><code>sub</code> / <code>gsub</code><br />
+can be RegEx</li>
+<li><code>grep</code> (return indices or values) / <code>grepl</code> (return T/F)<br />
+can be RegEx</li>
+<li><code>nchar</code></li>
+<li><code>substr</code></li>
+<li><code>paste</code> / <code>paste0</code></li>
+<li><code>stringr::str_trim</code></li>
+</ul>
 <p>[Return to <a href="#table-of-content">Table of Content</a>]</p>
 <hr />
 </div>
+<div id="regex" class="section level3">
+<h3>RegEx</h3>
+<p>metacharacters:</p>
+<ul>
+<li><code>^</code><br />
+beginning</li>
+<li><code>$</code><br />
+end</li>
+<li><code>.</code><br />
+any character</li>
+<li><code>|</code><br />
+alternative patterns</li>
+</ul>
+<p>escape:<br />
+<code>\\</code></p>
+<p>[Return to <a href="#table-of-content">Table of Content</a>]</p>
+<hr />
+</div>
+<div id="datetime" class="section level3">
+<h3>Datetime</h3>
+<pre class="r"><code>library(lubridate)
+today()
+t1 &lt;- now(tzone = &quot;America/New_York&quot;)
+
+update(now(), hours=14, minutes=3)
+now() + hours(1) + minutes(2)
+
+with_tz(now(), tzone='Asia/Hong_Kong')
+
+time.between &lt;- interval(t1, now())
+as.period(time.between)</code></pre>
+<p>List of valid time zones for use with <code>lubridate</code>:<br />
+<a href="http://en.wikipedia.org/wiki/List_of_tz_database_time_zones" class="uri">http://en.wikipedia.org/wiki/List_of_tz_database_time_zones</a></p>
+<p>[Return to <a href="#table-of-content">Table of Content</a>]</p>
+<hr />
 </div>
 <div id="data.table" class="section level3">
 <h3><code>data.table</code></h3>
@@ -926,7 +985,7 @@ cut2(x, g=4)</code></pre>
 head(DT, 3)</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["x"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["y"],"name":[2],"type":["chr"],"align":["left"]},{"label":["z"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.9761841","2":"a","3":"-0.07361692"},{"1":"-0.5379922","2":"a","3":"2.02815483"},{"1":"1.0515102","2":"a","3":"-0.86883869"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["x"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["y"],"name":[2],"type":["chr"],"align":["left"]},{"label":["z"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"1.1469192","2":"a","3":"-0.23609264"},{"1":"0.1047603","2":"a","3":"0.06713503"},{"1":"-1.7180788","2":"a","3":"-2.36741997"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <p>See all the data tables in memory:</p>
@@ -938,32 +997,32 @@ head(DT, 3)</code></pre>
 <pre class="r"><code>DT[2,]</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["x"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["y"],"name":[2],"type":["chr"],"align":["left"]},{"label":["z"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"-0.5379922","2":"a","3":"2.028155"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["x"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["y"],"name":[2],"type":["chr"],"align":["left"]},{"label":["z"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.1047603","2":"a","3":"0.06713503"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <pre class="r"><code>DT[DT$y=='a',]</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["x"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["y"],"name":[2],"type":["chr"],"align":["left"]},{"label":["z"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.9761841","2":"a","3":"-0.07361692"},{"1":"-0.5379922","2":"a","3":"2.02815483"},{"1":"1.0515102","2":"a","3":"-0.86883869"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["x"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["y"],"name":[2],"type":["chr"],"align":["left"]},{"label":["z"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"1.1469192","2":"a","3":"-0.23609264"},{"1":"0.1047603","2":"a","3":"0.06713503"},{"1":"-1.7180788","2":"a","3":"-2.36741997"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <pre class="r"><code>DT[c(2,3)]</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["x"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["y"],"name":[2],"type":["chr"],"align":["left"]},{"label":["z"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"-0.5379922","2":"a","3":"2.0281548"},{"1":"1.0515102","2":"a","3":"-0.8688387"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["x"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["y"],"name":[2],"type":["chr"],"align":["left"]},{"label":["z"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.1047603","2":"a","3":"0.06713503"},{"1":"-1.7180788","2":"a","3":"-2.36741997"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <p>Columns expressions:</p>
 <pre class="r"><code>DT[, c(2,3)]</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["y"],"name":[1],"type":["chr"],"align":["left"]},{"label":["z"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"a","2":"-0.07361692"},{"1":"a","2":"2.02815483"},{"1":"a","2":"-0.86883869"},{"1":"b","2":"-0.58071540"},{"1":"b","2":"0.07017068"},{"1":"b","2":"-0.48185274"},{"1":"c","2":"-0.65702667"},{"1":"c","2":"-1.58038519"},{"1":"c","2":"-0.70850518"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["y"],"name":[1],"type":["chr"],"align":["left"]},{"label":["z"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"a","2":"-0.23609264"},{"1":"a","2":"0.06713503"},{"1":"a","2":"-2.36741997"},{"1":"b","2":"1.29851067"},{"1":"b","2":"-1.04207432"},{"1":"b","2":"-0.09659949"},{"1":"c","2":"0.72565736"},{"1":"c","2":"-1.55934203"},{"1":"c","2":"0.99783514"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <pre class="r"><code>DT[, list(mean(x), sum(z))]</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["V1"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["V2"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"0.314136","2":"-2.852615"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["V1"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["V2"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"-0.3917955","2":"-2.21239"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <pre class="r"><code>DT[, table(y)]</code></pre>
@@ -985,7 +1044,7 @@ DT[, b:= mean(x+w), by=a]
 DT[, .N, by=a]</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["a"],"name":[1],"type":["lgl"],"align":["right"]},{"label":["N"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"TRUE","2":"5"},{"1":"FALSE","2":"4"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["a"],"name":[1],"type":["lgl"],"align":["right"]},{"label":["N"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"TRUE","2":"4"},{"1":"FALSE","2":"5"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <p>Keys</p>
@@ -994,7 +1053,7 @@ setkey(DT, x)
 DT['a']</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["x"],"name":[1],"type":["chr"],"align":["left"]},{"label":["y"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"a","2":"-0.12588053"},{"1":"a","2":"0.62421554"},{"1":"a","2":"-0.23420513"},{"1":"a","2":"0.06886389"},{"1":"a","2":"0.47112854"},{"1":"a","2":"0.79446136"},{"1":"a","2":"0.85605091"},{"1":"a","2":"1.53338574"},{"1":"a","2":"-0.86395795"},{"1":"a","2":"-0.95810377"},{"1":"a","2":"-1.78153980"},{"1":"a","2":"0.16625992"},{"1":"a","2":"-1.15116737"},{"1":"a","2":"-0.41581293"},{"1":"a","2":"1.96561939"},{"1":"a","2":"2.21264218"},{"1":"a","2":"-0.20894113"},{"1":"a","2":"0.44070723"},{"1":"a","2":"-0.78044696"},{"1":"a","2":"0.65885499"},{"1":"a","2":"0.56528983"},{"1":"a","2":"-1.53574178"},{"1":"a","2":"1.73481854"},{"1":"a","2":"0.90612128"},{"1":"a","2":"0.07545806"},{"1":"a","2":"0.29141388"},{"1":"a","2":"0.98534433"},{"1":"a","2":"-0.78838125"},{"1":"a","2":"0.40488078"},{"1":"a","2":"0.64896869"},{"1":"a","2":"1.10431335"},{"1":"a","2":"-1.55896586"},{"1":"a","2":"0.36951789"},{"1":"a","2":"0.92892589"},{"1":"a","2":"1.12805071"},{"1":"a","2":"0.48403568"},{"1":"a","2":"2.26047027"},{"1":"a","2":"-0.52890363"},{"1":"a","2":"0.50655833"},{"1":"a","2":"0.94402926"},{"1":"a","2":"-1.01696206"},{"1":"a","2":"0.62440242"},{"1":"a","2":"0.09960560"},{"1":"a","2":"-0.37213242"},{"1":"a","2":"1.09217505"},{"1":"a","2":"0.25710905"},{"1":"a","2":"1.06710366"},{"1":"a","2":"2.15406614"},{"1":"a","2":"1.16593949"},{"1":"a","2":"-1.16648858"},{"1":"a","2":"-0.72569201"},{"1":"a","2":"0.90600866"},{"1":"a","2":"-1.60504504"},{"1":"a","2":"0.29653183"},{"1":"a","2":"-0.87499481"},{"1":"a","2":"-0.20998112"},{"1":"a","2":"0.37809390"},{"1":"a","2":"0.55093470"},{"1":"a","2":"-0.44718696"},{"1":"a","2":"0.02864624"},{"1":"a","2":"-1.29622443"},{"1":"a","2":"0.26325645"},{"1":"a","2":"0.64833829"},{"1":"a","2":"0.57062168"},{"1":"a","2":"0.26077278"},{"1":"a","2":"2.57355648"},{"1":"a","2":"0.64924885"},{"1":"a","2":"-0.46401777"},{"1":"a","2":"0.28004327"},{"1":"a","2":"-1.05135998"},{"1":"a","2":"1.29602818"},{"1":"a","2":"0.28357178"},{"1":"a","2":"-2.71762721"},{"1":"a","2":"-0.90281101"},{"1":"a","2":"0.44257207"},{"1":"a","2":"1.49725887"},{"1":"a","2":"-1.22399810"},{"1":"a","2":"0.89928343"},{"1":"a","2":"-0.84756486"},{"1":"a","2":"-1.14158843"},{"1":"a","2":"0.30709215"},{"1":"a","2":"1.76886418"},{"1":"a","2":"-1.22792535"},{"1":"a","2":"-1.82691266"},{"1":"a","2":"-0.05529846"},{"1":"a","2":"0.09837367"},{"1":"a","2":"-0.61684189"},{"1":"a","2":"0.66633246"},{"1":"a","2":"1.51153223"},{"1":"a","2":"-0.77805636"},{"1":"a","2":"0.12710024"},{"1":"a","2":"1.67389403"},{"1":"a","2":"-0.72594773"},{"1":"a","2":"-0.45541013"},{"1":"a","2":"-0.67841101"},{"1":"a","2":"-1.05692552"},{"1":"a","2":"0.36048889"},{"1":"a","2":"0.21219467"},{"1":"a","2":"0.12803668"},{"1":"a","2":"0.32810793"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["x"],"name":[1],"type":["chr"],"align":["left"]},{"label":["y"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"a","2":"1.19857419"},{"1":"a","2":"-1.29347236"},{"1":"a","2":"-0.02609524"},{"1":"a","2":"1.29656564"},{"1":"a","2":"-0.76559230"},{"1":"a","2":"1.04729254"},{"1":"a","2":"1.06646722"},{"1":"a","2":"-0.29220485"},{"1":"a","2":"-0.31341543"},{"1":"a","2":"-1.00326906"},{"1":"a","2":"-0.20649190"},{"1":"a","2":"-0.53615261"},{"1":"a","2":"0.66533737"},{"1":"a","2":"1.01835521"},{"1":"a","2":"0.48259199"},{"1":"a","2":"-0.16006204"},{"1":"a","2":"-0.16659994"},{"1":"a","2":"-1.17395633"},{"1":"a","2":"-0.61203906"},{"1":"a","2":"-0.37823851"},{"1":"a","2":"-0.44046378"},{"1":"a","2":"-0.82311091"},{"1":"a","2":"0.48649867"},{"1":"a","2":"-1.78460854"},{"1":"a","2":"-0.43536142"},{"1":"a","2":"-0.48521898"},{"1":"a","2":"-0.73445363"},{"1":"a","2":"0.40289928"},{"1":"a","2":"0.53515152"},{"1":"a","2":"0.09813326"},{"1":"a","2":"-1.25495347"},{"1":"a","2":"0.31382191"},{"1":"a","2":"0.94065560"},{"1":"a","2":"0.22223260"},{"1":"a","2":"-1.23747419"},{"1":"a","2":"0.88869825"},{"1":"a","2":"0.06282286"},{"1":"a","2":"0.48887453"},{"1":"a","2":"-1.09331564"},{"1":"a","2":"0.73662072"},{"1":"a","2":"-0.60747819"},{"1":"a","2":"-0.34321751"},{"1":"a","2":"-0.28273075"},{"1":"a","2":"-0.43046350"},{"1":"a","2":"0.10062706"},{"1":"a","2":"1.23718734"},{"1":"a","2":"0.33699845"},{"1":"a","2":"0.74774039"},{"1":"a","2":"2.32709715"},{"1":"a","2":"1.65482649"},{"1":"a","2":"-0.66814986"},{"1":"a","2":"-1.89345028"},{"1":"a","2":"-1.84472541"},{"1":"a","2":"-0.92041504"},{"1":"a","2":"-0.79567029"},{"1":"a","2":"-1.10015257"},{"1":"a","2":"-1.22339134"},{"1":"a","2":"0.27645869"},{"1":"a","2":"-0.14895215"},{"1":"a","2":"-0.06651984"},{"1":"a","2":"2.21314877"},{"1":"a","2":"1.06612371"},{"1":"a","2":"0.15619010"},{"1":"a","2":"0.22801924"},{"1":"a","2":"1.07867334"},{"1":"a","2":"0.23233055"},{"1":"a","2":"-0.51316718"},{"1":"a","2":"0.21396409"},{"1":"a","2":"1.88822395"},{"1":"a","2":"-1.52157273"},{"1":"a","2":"0.68847522"},{"1":"a","2":"-0.39771628"},{"1":"a","2":"-0.27267799"},{"1":"a","2":"-0.29165469"},{"1":"a","2":"1.44469989"},{"1":"a","2":"-0.32858500"},{"1":"a","2":"-1.90957746"},{"1":"a","2":"-0.11932196"},{"1":"a","2":"0.04161414"},{"1":"a","2":"0.95207587"},{"1":"a","2":"-1.74079250"},{"1":"a","2":"0.69757074"},{"1":"a","2":"-0.03613649"},{"1":"a","2":"-0.88357860"},{"1":"a","2":"-0.91771166"},{"1":"a","2":"-0.06205993"},{"1":"a","2":"-0.48144462"},{"1":"a","2":"-1.26083060"},{"1":"a","2":"0.06859133"},{"1":"a","2":"-0.90028706"},{"1":"a","2":"-0.10571829"},{"1":"a","2":"-1.14395140"},{"1":"a","2":"0.69562499"},{"1":"a","2":"-2.02902470"},{"1":"a","2":"-0.81286777"},{"1":"a","2":"-0.60818785"},{"1":"a","2":"-0.69628200"},{"1":"a","2":"-0.85104408"},{"1":"a","2":"1.23534470"},{"1":"a","2":"-0.06900236"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <p>Use keys to facilitate joins:</p>
@@ -1066,7 +1125,7 @@ join_all(dfList)</code></pre>
 ## Joining by: id</code></pre>
 <div data-pagedtable="false">
 <script data-pagedtable-source type="application/json">
-{"columns":[{"label":["id"],"name":[1],"type":["int"],"align":["right"]},{"label":["x"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["y"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["z"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"-0.4096968","3":"-0.9826849","4":"-0.07129851"},{"1":"4","2":"1.3398516","3":"-1.3763790","4":"-0.55434854"},{"1":"9","2":"-0.1511013","3":"0.7310789","4":"0.05236930"},{"1":"2","2":"-0.4308853","3":"0.7633944","4":"-1.93044669"},{"1":"8","2":"0.6061991","3":"0.9803220","4":"-0.42762376"},{"1":"5","2":"0.7114115","3":"-1.2106784","4":"1.96805339"},{"1":"3","2":"0.5552810","3":"0.0213396","4":"0.64801474"},{"1":"6","2":"-0.5291275","3":"-0.7394865","4":"-1.54517009"},{"1":"7","2":"-0.7691801","3":"-0.6210996","4":"1.09647587"},{"1":"10","2":"-1.1138419","3":"-0.1843939","4":"-0.51063499"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["id"],"name":[1],"type":["int"],"align":["right"]},{"label":["x"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["y"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["z"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"4","2":"1.16212495","3":"2.1217996","4":"1.1385686"},{"1":"8","2":"0.86274710","3":"0.7716232","4":"-1.0006046"},{"1":"2","2":"-1.63477868","3":"1.3972600","4":"1.9864972"},{"1":"5","2":"0.22492923","3":"-0.1011837","4":"-0.9495471"},{"1":"7","2":"0.59970274","3":"0.3041963","4":"0.0538407"},{"1":"3","2":"0.00920664","3":"1.4280515","4":"0.3500268"},{"1":"10","2":"-0.89158925","3":"-0.2486687","4":"-0.1630080"},{"1":"1","2":"-0.39781865","3":"0.3583025","4":"-0.6130815"},{"1":"6","2":"-1.37913612","3":"-0.5167404","4":"1.8857596"},{"1":"9","2":"0.77721581","3":"-0.8512967","4":"-0.5822027"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 <p>[Return to <a href="#table-of-content">Table of Content</a>]</p>
@@ -1075,19 +1134,53 @@ join_all(dfList)</code></pre>
 </div>
 <div id="dplyr" class="section level3">
 <h3><code>dplyr</code></h3>
+<p>Convert a data frame to a “data frame tbl” object (for easier viewing):</p>
+<pre class="r"><code>tbl_df(dataframe)</code></pre>
 <ul>
-<li><code>select</code></li>
-<li><code>filter</code></li>
+<li><code>select</code> subsetting columns</li>
+<li><code>filter</code> subsetting rows</li>
 <li><code>arrange</code></li>
 <li><code>rename</code><br />
 <code>rename(df, newName = oldName)</code></li>
 <li><code>mutate</code></li>
 <li><code>group_by</code></li>
-<li><code>summarize</code></li>
+<li><code>summarize</code>
+<ul>
+<li><code>n()</code><br />
+total number of rows</li>
+<li><code>n_distinct(var)</code><br />
+total number of unique rows</li>
+</ul></li>
 <li><code>%&gt;%</code></li>
 </ul>
 <p>[Return to <a href="#table-of-content">Table of Content</a>]</p>
 <hr />
+</div>
+<div id="tidyr" class="section level3">
+<h3><code>tidyr</code></h3>
+<div id="when-column-headers-are-values-not-variable-names" class="section level4">
+<h4>When column headers are values, not variable names</h4>
+<p><code>gather</code></p>
+</div>
+<div id="when-multiple-variables-are-stored-in-one-column" class="section level4">
+<h4>When multiple variables are stored in one column</h4>
+<p><code>separate</code><br />
+default to split on non-alphanumeric values (the <code>sep</code> argument)</p>
+</div>
+<div id="when-variables-are-stored-in-both-rows-and-columns" class="section level4">
+<h4>When variables are stored in both rows and columns</h4>
+<p><code>spread</code></p>
+</div>
+<div id="when-multiple-observational-units-are-stored-in-the-same-table" class="section level4">
+<h4>When multiple observational units are stored in the same table</h4>
+<p><code>select</code> followed by <code>unique</code></p>
+</div>
+<div id="when-a-single-observational-unit-is-stored-in-multiple-tables" class="section level4">
+<h4>When a single observational unit is stored in multiple tables</h4>
+<p><code>bind_rows</code></p>
+<p>[Return to <a href="#table-of-content">Table of Content</a>]</p>
+<hr />
+</div>
 </div>
 <div id="reshape-data" class="section level3">
 <h3>Reshape Data</h3>
@@ -1106,7 +1199,8 @@ join_all(dfList)</code></pre>
 </div>
 <div id="merge-data-1" class="section level3">
 <h3>Merge Data</h3>
-<p><code>merge</code> <code>intersect</code></p>
+<p><code>merge</code><br />
+<code>intersect</code></p>
 <p>[Return to <a href="#table-of-content">Table of Content</a>]</p>
 <hr />
 </div>

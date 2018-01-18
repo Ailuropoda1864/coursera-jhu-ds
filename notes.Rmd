@@ -30,6 +30,7 @@ knitr::opts_knit$set(root.dir = normalizePath(params$home.dir))
 ?read.table
 help.search('data input')
 find('anova')
+help(package=lubridate)
 
 args('rnorm')
 formals(rnorm)
@@ -552,6 +553,9 @@ names(df)  # df.columns in Python
 # missing values
 sum(is.na(df$Admit))
 colSums(is.na(df))
+
+# duplicates
+sum(duplicated(df))
 ```
 
 #### Distributions
@@ -578,9 +582,13 @@ xtabs(Freq ~ Gender + Admit, data=df)
 ## Data Wrangling
 * [Handle Missing Values]
 * [Factor]
+* [Text]
+* [RegEx]
+* [Datetime]
 * [`data.table`]
 * [`plyr`]
 * [`dplyr`]
+* [`tidyr`]
 * [Reshape Data]
 * [Merge Data]
 
@@ -663,6 +671,62 @@ cut(x, breaks)
 library(Hmisc)
 cut2(x, g=4)
 ```
+
+### Text
+
+- `tolower` / `toupper`
+- `strsplit`
+- `sub` / `gsub`  
+can be RegEx 
+- `grep` (return indices or values) / `grepl` (return T/F)  
+can be RegEx
+- `nchar`
+- `substr`
+- `paste` / `paste0`
+- `stringr::str_trim`
+
+[Return to [Table of Content]]
+
+***
+
+### RegEx
+
+metacharacters:
+
+- `^`  
+beginning
+- `$`  
+end
+- `.`  
+any character
+- `|`  
+alternative patterns
+
+escape:  
+`\\`
+
+[Return to [Table of Content]]
+
+***
+
+### Datetime
+```{r eval=FALSE}
+library(lubridate)
+today()
+t1 <- now(tzone = "America/New_York")
+
+update(now(), hours=14, minutes=3)
+now() + hours(1) + minutes(2)
+
+with_tz(now(), tzone='Asia/Hong_Kong')
+
+time.between <- interval(t1, now())
+as.period(time.between)
+```
+
+List of valid time zones for use with `lubridate`:  
+http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+
 
 [Return to [Table of Content]]
 
@@ -789,16 +853,47 @@ join_all(dfList)
 ***
 
 ### `dplyr`
+Convert a data frame to a "data frame tbl" object (for easier viewing):
+```{r eval=FALSE}
+tbl_df(dataframe)
+```
 
 - `select`
+subsetting columns
 - `filter`
+subsetting rows
 - `arrange`
 - `rename`  
 `rename(df, newName = oldName)`
 - `mutate`
 - `group_by`
 - `summarize`
+    - `n()`  
+    total number of rows
+    - `n_distinct(var)`  
+    total number of unique rows
 - `%>%`
+
+[Return to [Table of Content]]
+
+***
+
+### `tidyr`
+#### When column headers are values, not variable names
+`gather`
+
+#### When multiple variables are stored in one column
+`separate`  
+default to split on non-alphanumeric values (the `sep` argument)
+
+#### When variables are stored in both rows and columns
+`spread`
+
+#### When multiple observational units are stored in the same table
+`select` followed by `unique`
+
+#### When a single observational unit is stored in multiple tables
+`bind_rows`
 
 [Return to [Table of Content]]
 
