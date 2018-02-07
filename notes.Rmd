@@ -929,19 +929,105 @@ See also: `acast`
 ***
 
 ## Plotting
+* [Base]
+* [lattice]
+* [ggplot2]
+* [Graphics Devices]
+
+### Base
+Use `example(points)` to see examples (press `Esc` to exit).
+
+#### Base graphics parameters
+Use `?par` to see the complete list. Also: `names(par())`
+  
+To see the default values for global graphics paremeters:
+```{r}
+par('lty')
+```
+
+- `pch`  
+The plottin symbol (default is open circle).
+  
+- `lty`  
+The line type. Line types can either be specified as an integer (0=blank, 1=solid (default), 2=dashed, 3=dotted, 4=dotdash, 5=longdash, 6=twodash) or as one of the character strings "blank", "solid", "dashed", "dotted", "dotdash", "longdash", or "twodash", where "blank" uses ‘invisible lines’ (i.e., does not draw them).
+  
+- `col`  
+The plotting color. The `colors()` function provides a vector of colors by name.
+
+- `las`  
+The orientation of the axis labels on the plot.
+
+- `mfrow`  
+Number of plots per row, column (plots are filled row-wise).
+
+- `mfcol`  
+Number of plots per row, column (plots are filled column-wise).
+  
+The par() function is used to specify global graphics parameters that affect all plots in an R session. (Use `dev.off` or `plot.new` to reset to the defaults.)
+
+#### Scatterplot
 ```{r}
 library('datasets')
+
 head(cars)
-str(cars)
 plot(cars, main='Speeds of cars by distance')
+
+head(Puromycin)
+plot(Puromycin$conc, Puromycin$rate, col=Puromycin$state)
+# add regression line
+model <- lm(rate ~ conc, Puromycin)
+abline(model, col='blue')
+
+
+head(airquality)
+with(airquality,
+     plot(Wind, Ozone, 
+          main='Ozone and Wind in New York City',
+          type='n'))  # 'n' for no plotting
+with(subset(airquality, Month==5), points(Wind, Ozone, col='blue'))
+with(subset(airquality, Month!=5), points(Wind, Ozone, col='red'))
+legend('topright', pch=1, 
+       col=c('blue', 'red'), 
+       legend=c('May', 'Other Months'))
+```
+
+Other functions that add to a plot (but do not create a plot):  
+
+- `lines`
+- `points`
+- `text`
+- `title`
+- `mtext`  
+add arbitrary text to the margines (inner or outer) of the plot
+- `axis`
+
+#### Boxplot
+```{r}
 boxplot(cars)
+
+# use formula
+boxplot(Temp ~ Month, data = airquality, xlab = 'Month', ylab = 'Ozone (ppb)')
+# add horizontal line
+abline(h=mean(airquality$Temp, na.rm = TRUE), lwd=2, col='red', lty=2)  
+```
+
+#### Histogram
+```{r}
+hist(cars$speed, col='green', breaks=10)
+rug(cars$speed)
+# add vertical line
+abline(v=mean(cars$speed, na.rm=TRUE), lwd=4)
+```
+
+#### Barplot
+```{r}
+barplot(table(Puromycin$state))
 ```
 
 #### Create subplots:
 ```{r eval=FALSE}
 par(mfcol=c(1,2))
 ```
-This is the same as `par(mfrow=c(1,2))`
 
 #### Use `with` to simplify code:
 ```{r echo=-1}
@@ -954,6 +1040,73 @@ with(cars, {
 }
      )
 ```
+
+[Return to [Table of Content]]
+
+***
+
+### lattice
+```{r}
+library(lattice)
+state <- data.frame(state.x77, region=state.region)
+head(state)
+xyplot(Life.Exp ~ Income | region, data=state, layout=c(4,1))
+```
+
+Also:
+`bwplot`
+
+[Return to [Table of Content]]
+
+***
+
+### ggplot2
+```{r}
+library(ggplot2)
+qplot(conc, rate, data=Puromycin)
+```
+
+[Return to [Table of Content]]
+
+***
+
+### Graphics Devices
+Use `?Devices` to see the graphics devices available on current system.
+
+```{r eval=FALSE}
+# open file dvice; create pdf file in wd
+pdf(file='myplot.pdf')
+# create plot
+plot(x, y)
+# add annotation
+title(main='Title')
+# close the pdf file device
+dev.off()
+# now the pdf file can be viewed on computer
+```
+
+Find the currently active graphics device:
+```{r eval=FALSE}
+dev.cur()
+```
+
+Change the active graphics device:
+```{r eval=FALSE}
+dev.set(<integer>)
+```
+
+Copy plots:
+```{r eval=FALSE}
+# copy a plot from one device to another
+dev.copy(png, file='myplot.png')
+# close the png device
+dev.off()
+
+# copy a plot to a pdf file
+dev.copy2pdf()
+```
+
+
 
 [Return to [Table of Content]]
 
