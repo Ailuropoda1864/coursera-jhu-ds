@@ -991,6 +991,16 @@ legend('topright', pch=1,
        legend=c('May', 'Other Months'))
 ```
 
+Another example of customerizing `legend`:
+```{r eval=FALSE}
+legend('topright', 
+       legend=paste0('Sub_metering_', 1:3), 
+       col=c("black","red","blue"), 
+       lty=c(1,1,1),  # the symbols are lines
+       bty='n')  # no border around legend
+
+```
+
 Other functions that add to a plot (but do not create a plot):  
 
 - `lines`
