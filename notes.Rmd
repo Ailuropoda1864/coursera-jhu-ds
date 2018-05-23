@@ -1120,13 +1120,13 @@ right of ~ : columns of the panel
 
 
 #### `ggplot`
-```{r}
+```{r eval=FALSE}
 ggplot(data, aes(x, y)) 
     + geom_point(color='steelblue', size=4, alpha=1/2)
     + geom_smooth(size=4, linetype=3, method='lm', se=FALSE)
     + facet_grid(. ~ factor.var)
     + labs(title, x, y)
-    + theme_bw(base_family='Times') # base_family: font
+    + theme_bw(base_family='Times', base_size=10) # base_family: font
 ```
 
 Assign color to a data variable
@@ -1135,8 +1135,25 @@ geom_point(aes(color=factor.var), size=4, alpha=1/2)
 ```
 
 Additonal options:
-```{r}
+```{r eval=FALSE}
 geom_line()
+facet_wrap(formula, nrow, ncol)
+
+# annotation
+xlab()
+ylab()
+ggtitle()
+
+# for things that only make sense globally
+theme(legend.position='none')
+
+# two standard appearance themes are included:
+theme_gray()
+theme_bw()
+
+# axis limits
+ylim(y.min, y.max)  # remove outlier
+coord_cartesian(ylim=c(y.min, y.max))  # outlier included
 ```
 
 
