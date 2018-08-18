@@ -1,5 +1,5 @@
 old.dir <- getwd()
-setwd('/home/fay/code/r_coursera/week4')
+setwd('/home/fay/code/r_coursera/2_R_Programming/data/week4')
 
 
 # 1. Plot the 30-day mortality rates for heart attack

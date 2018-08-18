@@ -1,5 +1,5 @@
 old.dir <- getwd()
-setwd('~/code/r_coursera/Getting and Cleaning Data')
+setwd('~/code/r_coursera/3_Getting_and_Cleaning_Data')
 
 # Q1
 # download.file('https://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06hid.csv',

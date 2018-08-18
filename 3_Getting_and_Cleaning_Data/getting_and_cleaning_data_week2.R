@@ -1,5 +1,5 @@
 old.dir <- getwd()
-setwd('~/code/r_coursera/Getting and Cleaning Data')
+setwd('~/code/r_coursera/3_Getting_and_Cleaning_Data')
 
 
 # Q1

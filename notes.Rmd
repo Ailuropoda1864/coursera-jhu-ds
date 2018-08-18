@@ -64,6 +64,12 @@ Install more than one:
 biocLite(c('GenomicFeatures', 'AnnotationDbi'))
 ```
 
+See all the installed packages
+```{r}
+installed.packages()
+```
+
+
 Load a library:
 ```{r eval=FALSE}
 library('swirl')
@@ -947,6 +953,7 @@ See also: `acast`
 * [lattice]
 * [ggplot2]
 * [Graphics Devices]
+* [`grDevices`]
 
 ### Base
 Use `example(points)` to see examples (press `Esc` to exit).
@@ -1064,11 +1071,30 @@ with(cars, {
 library(lattice)
 state <- data.frame(state.x77, region=state.region)
 head(state)
-xyplot(Life.Exp ~ Income | region, data=state, layout=c(4,1))
+xyplot(Life.Exp ~ Income | region, 
+       data=state, 
+       layout=c(4,1),
+       strip=TRUE)  # strip labels each panel (default is TRUE)
 ```
+Takes other arguments such as `pch`, `col`, `main`
+
+```{r eval=FALSE}
+p2 <- xyplot(y ~ x | f, panel = function(x, y, ...) {
+  panel.xyplot(x, y, ...)  ## First call default panel function
+  panel.lmline(x, y, col = 2)  ## Overlay a simple linear regression line
+})
+print(p2)
+```
+`panel.abline`
+`lpoints()` can be used to annotate the panels in a multi-panel lattice plot
 
 Also:
-`bwplot`
+`bwplot` - box-and-whiskers plots
+
+`trellis.par.set()` can be used to finely control the appearance of all lattice plots.
+
+
+
 
 [Return to [Table of Content]]
 
@@ -1196,6 +1222,32 @@ dev.off()
 
 # copy a plot to a pdf file
 dev.copy2pdf()
+```
+
+
+
+[Return to [Table of Content]]
+
+***
+
+
+### `grDevices`
+```{r}
+library(grDevices)
+colors <- colors()
+length(colors)
+sample(colors, 10)
+```
+
+```{r}
+pal <- colorRamp(c('red', 'blue'))
+pal(1)
+pal(seq(0,1,len=6))
+```
+
+```{r}
+p1 <- colorRampPalette(c('red', 'blue'))
+p1(2)  # return n number of colors (in hex code)
 ```
 
 
