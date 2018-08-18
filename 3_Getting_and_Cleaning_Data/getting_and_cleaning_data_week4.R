@@ -1,5 +1,5 @@
 old.dir <- getwd()
-setwd('~/code/r_coursera/Getting and Cleaning Data/data/week4')
+setwd('~/code/r_coursera/3_Getting_and_Cleaning_Data/data/week4')
 
 
 # Q1
@@ -50,6 +50,7 @@ print(length(june))
 
 # Q5
 library(quantmod)
+library(lubridate)
 amzn = getSymbols("AMZN", auto.assign=FALSE)
 sampleTimes = index(amzn)
 

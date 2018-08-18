@@ -1,7 +1,7 @@
 # http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones
 
 old.dir <- getwd()
-setwd('~/code/r_coursera/Getting and Cleaning Data/data/project')
+setwd('~/code/r_coursera/3_Getting_and_Cleaning_Data/data/project')
 
 
 # 1. Merges the training and the test sets to create one data set.

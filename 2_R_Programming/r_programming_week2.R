@@ -1,4 +1,4 @@
-DIR <- '/home/fay/code/r_coursera/specdata'
+DIR <- '/home/fay/code/r_coursera/2_R_Programming/data/week2/specdata'
 
 
 # Part 1
